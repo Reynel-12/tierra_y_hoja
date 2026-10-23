@@ -119,7 +119,7 @@ Exportación de Bitácora:
 
 Generación de un reporte simple en PDF o para compartir por WhatsApp con un técnico agrícola, cooperativa o perito de banco.
 
-6. Módulo Básico de Costos (Opcional pero muy útil)
+6. Módulo Básico de Costos
 Muchos productores saben cuánto cosecharon, pero no cuánto invirtieron exactamente en cada manzana.
 
 Registro rápido de compras de insumos (precio del saco de abono, semilla, jornales).

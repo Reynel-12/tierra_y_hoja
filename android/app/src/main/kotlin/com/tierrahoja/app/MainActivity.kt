@@ -1,4 +1,4 @@
-package com.example.tierra_y_hoja
+package com.tierrahoja.app
 
 import io.flutter.embedding.android.FlutterActivity
 
