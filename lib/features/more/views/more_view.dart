@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/design/app_colors.dart';
@@ -26,6 +27,8 @@ class MoreView extends StatelessWidget {
     final t = context.t;
     final pad = context.screenPadding;
     final themeController = context.watch<ThemeController>();
+    final packageInfo = context.watch<PackageInfo?>();
+    final appVersion = packageInfo?.version ?? '1.1.0';
 
     return Scaffold(
       appBar: const AppTopBar(title: 'Más opciones'),
@@ -174,7 +177,7 @@ class MoreView extends StatelessWidget {
                             children: [
                               Text('Tierra & Hoja', style: t.titleSm),
                               Text(
-                                'Versión 1.1.0 · Cuaderno de Campo',
+                                'Versión $appVersion · Cuaderno de Campo',
                                 style: t.caption,
                               ),
                             ],

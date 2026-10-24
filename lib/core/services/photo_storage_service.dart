@@ -38,8 +38,11 @@ class PhotoStorageService {
   Directory? _photosDir;
 
   /// Abre la cámara o la galería. Devuelve la ruta guardada o `null` si el
-  /// usuario canceló.
-  Future<String?> pick(PhotoSource source) async {
+  /// usuario canceló. Por defecto, la cámara se abre con el lente principal trasero.
+  Future<String?> pick(
+    PhotoSource source, {
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+  }) async {
     final XFile? picked;
     try {
       picked = await _picker.pickImage(
@@ -50,6 +53,7 @@ class PhotoStorageService {
         maxHeight: _maxSide,
         imageQuality: _quality,
         requestFullMetadata: false,
+        preferredCameraDevice: preferredCameraDevice,
       );
     } on PlatformException catch (e) {
       debugPrint('Error al abrir ${source.name}: $e');

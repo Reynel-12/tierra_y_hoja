@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import 'app/app_shell.dart';
@@ -11,6 +12,7 @@ import 'core/services/photo_storage_service.dart';
 import 'core/services/reminder_service.dart';
 import 'core/services/speech_service.dart';
 import 'core/state/theme_controller.dart';
+import 'core/widgets/animated_splash.dart';
 import 'features/activities/data/activity_repository.dart';
 import 'features/costs/data/cost_repository.dart';
 import 'features/cycles/data/cycle_repository.dart';
@@ -23,57 +25,212 @@ import 'features/tour/views/guided_tour_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 1. Inicializar base de datos SQLite local
-  final database = await AppDatabase.open();
+  AppDatabase? database;
+  ThemeMode initialThemeMode = ThemeMode.system;
+  PackageInfo? packageInfo;
 
-  // 2. Inicializar servicio de recordatorios offline
-  final reminderService = ReminderService();
-  await reminderService.init();
+  try {
+    database = await AppDatabase.open();
+    initialThemeMode = await ThemeController.getSavedThemeMode(database);
+  } catch (_) {}
 
-  // 3. Servicios del dispositivo
-  final photoService = PhotoStorageService();
-  const locationService = LocationService();
-  final speechService = SpeechService();
+  try {
+    packageInfo = await PackageInfo.fromPlatform();
+  } catch (_) {}
 
-  // 4. Repositorios de datos
-  final plotRepo = PlotRepository(database);
-  final cycleRepo = CycleRepository(database);
-  final appRepo = ApplicationRepository(database);
-  final activityRepo = ActivityRepository(database);
-  final costRepo = CostRepository(database);
-  final historyRepo = HistoryRepository(database);
-
-  // 5. Controlador de Tour Guiado (validación de primera vez)
-  final tourController = GuidedTourController(database);
-  await tourController.init();
+  packageInfo ??= PackageInfo(
+    appName: 'Tierra & Hoja',
+    packageName: 'com.tierrayhoja.app',
+    version: '1.1.3',
+    buildNumber: '5',
+  );
 
   runApp(
-    MultiProvider(
-      providers: [
-        Provider<AppDatabase>.value(value: database),
-        Provider<DataChanges>.value(value: database.changes),
-        Provider<ReminderService>.value(value: reminderService),
-        Provider<PhotoStorageService>.value(value: photoService),
-        Provider<LocationService>.value(value: locationService),
-        Provider<SpeechService>.value(value: speechService),
-        Provider<PlotRepository>.value(value: plotRepo),
-        Provider<CycleRepository>.value(value: cycleRepo),
-        Provider<ApplicationRepository>.value(value: appRepo),
-        Provider<ActivityRepository>.value(value: activityRepo),
-        Provider<CostRepository>.value(value: costRepo),
-        Provider<HistoryRepository>.value(value: historyRepo),
-        ChangeNotifierProvider(create: (_) => ThemeController(database)),
-        ChangeNotifierProvider<GuidedTourController>.value(
-          value: tourController,
-        ),
-      ],
-      child: const TierraYHojaApp(),
+    TierraYHojaApp(
+      database: database,
+      initialThemeMode: initialThemeMode,
+      packageInfo: packageInfo,
     ),
   );
 }
 
-class TierraYHojaApp extends StatelessWidget {
-  const TierraYHojaApp({super.key});
+class _AppBootstrapData {
+  const _AppBootstrapData({
+    required this.database,
+    required this.reminderService,
+    required this.photoService,
+    required this.locationService,
+    required this.speechService,
+    required this.plotRepo,
+    required this.cycleRepo,
+    required this.appRepo,
+    required this.activityRepo,
+    required this.costRepo,
+    required this.historyRepo,
+    required this.tourController,
+    required this.themeController,
+    required this.packageInfo,
+  });
+
+  final AppDatabase database;
+  final ReminderService reminderService;
+  final PhotoStorageService photoService;
+  final LocationService locationService;
+  final SpeechService speechService;
+  final PlotRepository plotRepo;
+  final CycleRepository cycleRepo;
+  final ApplicationRepository appRepo;
+  final ActivityRepository activityRepo;
+  final CostRepository costRepo;
+  final HistoryRepository historyRepo;
+  final GuidedTourController tourController;
+  final ThemeController themeController;
+  final PackageInfo packageInfo;
+}
+
+class TierraYHojaApp extends StatefulWidget {
+  const TierraYHojaApp({
+    super.key,
+    this.database,
+    this.initialThemeMode = ThemeMode.system,
+    this.packageInfo,
+  });
+
+  final AppDatabase? database;
+  final ThemeMode initialThemeMode;
+  final PackageInfo? packageInfo;
+
+  @override
+  State<TierraYHojaApp> createState() => _TierraYHojaAppState();
+}
+
+class _TierraYHojaAppState extends State<TierraYHojaApp> {
+  late final Future<void> _bootstrapFuture;
+  _AppBootstrapData? _data;
+  bool _splashFinished = false;
+  late ThemeMode _splashThemeMode = widget.initialThemeMode;
+
+  @override
+  void initState() {
+    super.initState();
+    _bootstrapFuture = _init();
+  }
+
+  Future<void> _init() async {
+    // 1. Base de datos SQLite local
+    final database = widget.database ?? await AppDatabase.open();
+
+    // 2. Inicializar servicio de recordatorios offline
+    final reminderService = ReminderService();
+    await reminderService.init();
+
+    // 3. Servicios del dispositivo
+    final photoService = PhotoStorageService();
+    const locationService = LocationService();
+    final speechService = SpeechService();
+
+    // 4. Repositorios de datos
+    final plotRepo = PlotRepository(database);
+    final cycleRepo = CycleRepository(database);
+    final appRepo = ApplicationRepository(database);
+    final activityRepo = ActivityRepository(database);
+    final costRepo = CostRepository(database);
+    final historyRepo = HistoryRepository(database);
+
+    // 5. Controlador de Tour Guiado (validación de primera vez)
+    final tourController = GuidedTourController(database);
+    await tourController.init();
+
+    // 6. Controlador de tema con el modo ya cargado
+    final themeController = ThemeController(database, widget.initialThemeMode);
+    if (mounted && _splashThemeMode != themeController.themeMode) {
+      setState(() {
+        _splashThemeMode = themeController.themeMode;
+      });
+    }
+
+    final packageInfo = widget.packageInfo ??
+        await () async {
+          try {
+            return await PackageInfo.fromPlatform();
+          } catch (_) {
+            return PackageInfo(
+              appName: 'Tierra & Hoja',
+              packageName: 'com.tierrayhoja.app',
+              version: '1.1.3',
+              buildNumber: '5',
+            );
+          }
+        }();
+
+    _data = _AppBootstrapData(
+      database: database,
+      reminderService: reminderService,
+      photoService: photoService,
+      locationService: locationService,
+      speechService: speechService,
+      plotRepo: plotRepo,
+      cycleRepo: cycleRepo,
+      appRepo: appRepo,
+      activityRepo: activityRepo,
+      costRepo: costRepo,
+      historyRepo: historyRepo,
+      tourController: tourController,
+      themeController: themeController,
+      packageInfo: packageInfo,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_splashFinished || _data == null) {
+      return MaterialApp(
+        title: 'Tierra & Hoja',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: _splashThemeMode,
+        home: AnimatedSplash(
+          ready: _bootstrapFuture,
+          onDone: () {
+            if (mounted) {
+              setState(() => _splashFinished = true);
+            }
+          },
+        ),
+      );
+    }
+
+    final data = _data!;
+    return MultiProvider(
+      providers: [
+        Provider<AppDatabase>.value(value: data.database),
+        Provider<DataChanges>.value(value: data.database.changes),
+        Provider<ReminderService>.value(value: data.reminderService),
+        Provider<PhotoStorageService>.value(value: data.photoService),
+        Provider<LocationService>.value(value: data.locationService),
+        Provider<SpeechService>.value(value: data.speechService),
+        Provider<PlotRepository>.value(value: data.plotRepo),
+        Provider<CycleRepository>.value(value: data.cycleRepo),
+        Provider<ApplicationRepository>.value(value: data.appRepo),
+        Provider<ActivityRepository>.value(value: data.activityRepo),
+        Provider<CostRepository>.value(value: data.costRepo),
+        Provider<HistoryRepository>.value(value: data.historyRepo),
+        ChangeNotifierProvider<ThemeController>.value(
+          value: data.themeController,
+        ),
+        ChangeNotifierProvider<GuidedTourController>.value(
+          value: data.tourController,
+        ),
+        Provider<PackageInfo>.value(value: data.packageInfo),
+      ],
+      child: const _AppContent(),
+    );
+  }
+}
+
+class _AppContent extends StatelessWidget {
+  const _AppContent();
 
   @override
   Widget build(BuildContext context) {
