@@ -104,6 +104,18 @@ class FakePlotRepo implements PlotRepository {
   Future<List<Plot>> getAll() async => [];
 }
 
+class _FakeDuplicatePlotRepo implements PlotRepository {
+  _FakeDuplicatePlotRepo(this._plots);
+  final List<Plot> _plots;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<List<Plot>> getAll() async => _plots;
+}
+
+
 void main() {
   setUpAll(() async {
     await initializeDateFormatting('es', null);
@@ -152,6 +164,52 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
   });
+
+  testWidgets('CycleFormView handles duplicate plot IDs gracefully without throwing DropdownButton assertion', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    final duplicatePlots = [
+      Plot(
+        id: 1,
+        name: 'Lote El Rincón',
+        area: 2.0,
+        areaUnit: AreaUnit.manzanas,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Plot(
+        id: 1,
+        name: 'Lote El Rincón (Duplicado)',
+        area: 2.0,
+        areaUnit: AreaUnit.manzanas,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    ];
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<PlotRepository>(create: (_) => _FakeDuplicatePlotRepo(duplicatePlots)),
+          Provider<CycleRepository>(create: (_) => FakeCycleRepo()),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const CycleFormView(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    // Verify Dropdown rendered without assertion error
+    expect(find.byType(DropdownButtonFormField<int>), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 
   testWidgets('ExpenseFormView renders fields properly', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);

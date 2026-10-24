@@ -147,9 +147,18 @@ class _PlotPickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final validValue = plots.any((p) => p.id == selectedPlotId)
+    // Asegurar elementos únicos por ID para evitar duplicados en el dropdown
+    final uniquePlots = <int, Plot>{};
+    for (final plot in plots) {
+      if (plot.id != null) {
+        uniquePlots[plot.id!] = plot;
+      }
+    }
+    final distinctPlots = uniquePlots.values.toList();
+
+    final validValue = distinctPlots.any((p) => p.id == selectedPlotId)
         ? selectedPlotId
-        : (plots.isNotEmpty ? plots.first.id : null);
+        : (distinctPlots.isNotEmpty ? distinctPlots.first.id : null);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,7 +169,7 @@ class _PlotPickerField extends StatelessWidget {
           initialValue: validValue,
           isExpanded: true,
           items: [
-            for (final plot in plots)
+            for (final plot in distinctPlots)
               DropdownMenuItem(
                 value: plot.id,
                 child: Text('${plot.name} (${plot.areaDisplay})'),
@@ -176,3 +185,4 @@ class _PlotPickerField extends StatelessWidget {
     );
   }
 }
+

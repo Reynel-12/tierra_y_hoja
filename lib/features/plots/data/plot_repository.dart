@@ -10,9 +10,9 @@ class PlotRepository {
   Future<List<Plot>> getAll() async {
     // Obtenemos los lotes con el cultivo activo si existe
     final results = await _database.db.rawQuery('''
-      SELECT p.*, c.crop as active_crop
+      SELECT p.*, 
+        (SELECT c.crop FROM crop_cycles c WHERE c.plot_id = p.id AND c.stage != 'done' ORDER BY c.id DESC LIMIT 1) as active_crop
       FROM plots p
-      LEFT JOIN crop_cycles c ON c.plot_id = p.id AND c.stage != 'done'
       ORDER BY p.name COLLATE NOCASE ASC
     ''');
 
@@ -24,9 +24,9 @@ class PlotRepository {
 
   Future<Plot?> getById(int id) async {
     final results = await _database.db.rawQuery('''
-      SELECT p.*, c.crop as active_crop
+      SELECT p.*, 
+        (SELECT c.crop FROM crop_cycles c WHERE c.plot_id = p.id AND c.stage != 'done' ORDER BY c.id DESC LIMIT 1) as active_crop
       FROM plots p
-      LEFT JOIN crop_cycles c ON c.plot_id = p.id AND c.stage != 'done'
       WHERE p.id = ?
       LIMIT 1
     ''', [id]);
