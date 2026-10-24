@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../core/design/app_colors.dart';
 import '../../../core/design/app_icons.dart';
 import '../../../core/utils/choice_option.dart';
 import '../../activities/models/activity_models.dart';
@@ -12,7 +13,8 @@ enum TimelineEventType implements ChoiceOption {
   insumo('Insumos y foliares', AppIcons.application),
   labor('Labores culturales', AppIcons.task),
   plaga('Plagas y clima', AppIcons.incident),
-  etapa('Hitos de etapa', AppIcons.cycle);
+  etapa('Hitos de etapa', AppIcons.cycle),
+  cosecha('Cosechas y cierres', AppIcons.harvest);
 
   const TimelineEventType(this.label, this.icon);
 
@@ -63,13 +65,27 @@ class UnifiedTimelineItem {
         TimelineEventType.labor => AppIcons.task,
         TimelineEventType.plaga => AppIcons.incident,
         TimelineEventType.etapa => AppIcons.cycle,
+        TimelineEventType.cosecha => AppIcons.harvest,
         _ => AppIcons.leaf,
       };
 
   bool get hasPhotos => photoBefore != null || photoAfter != null;
 }
 
-/// Registro consolidado para la búsqueda de aprendizajes previos.
+/// Resultado paginado genérico para consultas de historial y memoria.
+class PaginatedResult<T> {
+  const PaginatedResult({
+    required this.items,
+    required this.totalCount,
+    required this.hasMore,
+  });
+
+  final List<T> items;
+  final int totalCount;
+  final bool hasMore;
+}
+
+/// Registro consolidado para la búsqueda de aprendizajes previos y memoria general.
 class LearningResult {
   const LearningResult({
     required this.crop,
@@ -80,6 +96,9 @@ class LearningResult {
     this.verdict,
     this.observation,
     this.photoPath,
+    this.type = TimelineEventType.todos,
+    this.id,
+    this.cycleId,
   });
 
   final String crop;
@@ -90,4 +109,26 @@ class LearningResult {
   final String? verdict;
   final String? observation;
   final String? photoPath;
+  final TimelineEventType type;
+  final int? id;
+  final int? cycleId;
+
+  IconData get icon => switch (type) {
+        TimelineEventType.insumo => AppIcons.application,
+        TimelineEventType.labor => AppIcons.task,
+        TimelineEventType.plaga => AppIcons.incident,
+        TimelineEventType.etapa => AppIcons.cycle,
+        TimelineEventType.cosecha => AppIcons.harvest,
+        _ => AppIcons.leaf,
+      };
+
+  Color color(AppColors c) => switch (type) {
+        TimelineEventType.insumo => c.primary,
+        TimelineEventType.labor => c.accentText,
+        TimelineEventType.plaga => c.negative,
+        TimelineEventType.etapa => c.info,
+        TimelineEventType.cosecha => c.positive,
+        _ => c.primary,
+      };
 }
+

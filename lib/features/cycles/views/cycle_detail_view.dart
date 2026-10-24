@@ -15,11 +15,16 @@ import '../../../core/widgets/badges.dart';
 import '../../../core/widgets/dialogs.dart';
 import '../../../core/widgets/feedback_states.dart';
 import '../../../core/widgets/layout.dart';
+import '../../../core/widgets/media/photo_widgets.dart';
 import '../../../core/widgets/metric_card.dart';
 import '../../activities/views/incident_form_view.dart';
 import '../../activities/views/task_form_view.dart';
 import '../../costs/views/cost_summary_view.dart';
 import '../../field_log/views/application_form_view.dart';
+import '../../field_log/views/follow_up_form_view.dart';
+import '../../history/data/history_repository.dart';
+import '../../history/models/experience_models.dart';
+import '../../history/views/cycle_timeline_view.dart';
 import '../controllers/cycle_controllers.dart';
 import '../data/cycle_repository.dart';
 import '../models/crop_cycle.dart';
@@ -38,12 +43,14 @@ class CycleDetailView extends StatelessWidget {
       create: (ctx) => CycleDetailController(
         cycleId,
         ctx.read<CycleRepository>(),
+        ctx.read<HistoryRepository>(),
         ctx.read<DataChanges>(),
       ),
       child: const _CycleDetailContent(),
     );
   }
 }
+
 
 class _CycleDetailContent extends StatelessWidget {
   const _CycleDetailContent();
@@ -349,6 +356,94 @@ class _CycleDetailContent extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpace.section),
 
+                  // Eventos y bitácora de la siembra
+                  SectionHeader(
+                    title: 'Eventos de esta siembra (${controller.events.length})',
+                    actionLabel: controller.events.isNotEmpty ? 'Ver bitácora' : null,
+                    onAction: controller.events.isNotEmpty
+                        ? () => Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => CycleTimelineView(cycle: cycle),
+                              ),
+                            )
+                        : null,
+                  ),
+                  if (controller.events.isEmpty)
+                    AppCard(
+                      child: Row(
+                        children: [
+                          CircleIcon(icon: AppIcons.leaf, color: c.inkMuted),
+                          const SizedBox(width: AppSpace.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Aún no hay eventos registrados', style: t.titleSm),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Registre insumos, labores o incidencias con los botones de arriba para consultar el historial aquí mismo.',
+                                  style: t.bodySm.copyWith(color: c.inkMuted),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    // Filtros rápidos dentro de la misma pantalla de siembra
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final filter in [
+                            TimelineEventType.todos,
+                            TimelineEventType.insumo,
+                            TimelineEventType.labor,
+                            TimelineEventType.plaga,
+                          ]) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(right: AppSpace.xs),
+                              child: FilterChip(
+                                avatar: Icon(filter.icon, size: AppSize.iconBadge),
+                                label: Text(
+                                  filter == TimelineEventType.todos
+                                      ? 'Todos (${controller.events.length})'
+                                      : filter == TimelineEventType.insumo
+                                          ? 'Insumos (${controller.events.where((e) => e.type == TimelineEventType.insumo).length})'
+                                          : filter == TimelineEventType.labor
+                                              ? 'Labores (${controller.events.where((e) => e.type == TimelineEventType.labor).length})'
+                                              : 'Plagas (${controller.events.where((e) => e.type == TimelineEventType.plaga).length})',
+                                ),
+                                selected: controller.selectedFilter == filter,
+                                onSelected: (_) => controller.setFilter(filter),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpace.md),
+                    if (controller.filteredEvents.isEmpty)
+                      AppCard(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: AppSpace.sm),
+                          child: Center(
+                            child: Text(
+                              'No hay eventos de este tipo en esta siembra',
+                              style: t.bodySm.copyWith(color: c.inkMuted),
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      for (final eventItem in controller.filteredEvents) ...[
+                        _CycleEventCard(item: eventItem),
+                        const SizedBox(height: AppSpace.sm),
+                      ],
+                  ],
+                  const SizedBox(height: AppSpace.section),
+
                   // Cuentas y Finanzas del ciclo
                   const SectionHeader(title: 'Finanzas de la siembra'),
                   AppCard(
@@ -427,3 +522,147 @@ class _CycleDetailContent extends StatelessWidget {
     );
   }
 }
+
+class _CycleEventCard extends StatelessWidget {
+  const _CycleEventCard({required this.item});
+
+  final UnifiedTimelineItem item;
+
+  Color _getEventColor(AppColors c, TimelineEventType type) => switch (type) {
+        TimelineEventType.insumo => c.primary,
+        TimelineEventType.labor => c.accentText,
+        TimelineEventType.plaga => c.negative,
+        TimelineEventType.etapa => c.info,
+        TimelineEventType.cosecha => c.positive,
+        _ => c.primary,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final t = context.t;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleIcon(
+                icon: item.icon,
+                color: _getEventColor(c, item.type),
+              ),
+              const SizedBox(width: AppSpace.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.title,
+                            style: t.titleSm,
+                          ),
+                        ),
+                        Text(
+                          Formatters.date(item.date),
+                          style: t.caption,
+                        ),
+                      ],
+                    ),
+                    if (item.subtitle != null) ...[
+                      const SizedBox(height: 2),
+                      Text(item.subtitle!, style: t.bodySm),
+                    ],
+                    if (item.badgeText != null) ...[
+                      const SizedBox(height: AppSpace.xs),
+                      StatusBadge(
+                        label: item.badgeText!,
+                        icon: AppIcons.check,
+                        color: _getEventColor(c, item.type),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (item.notes != null && item.notes!.isNotEmpty) ...[
+            const SizedBox(height: AppSpace.sm),
+            Text(
+              item.notes!,
+              style: t.bodySm.copyWith(color: c.ink),
+            ),
+          ],
+          if (item.hasPhotos) ...[
+            const SizedBox(height: AppSpace.md),
+            Row(
+              children: [
+                if (item.photoBefore != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpace.sm),
+                    child: GestureDetector(
+                      onTap: () => PhotoViewerPage.open(
+                        context,
+                        before: item.photoBefore,
+                        after: item.photoAfter,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PhotoThumb(
+                            path: item.photoBefore,
+                            size: 56,
+                            semanticLabel: 'Foto antes',
+                          ),
+                          const SizedBox(height: 2),
+                          Text('Antes', style: t.caption),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (item.photoAfter != null)
+                  GestureDetector(
+                    onTap: () => PhotoViewerPage.open(
+                      context,
+                      before: item.photoBefore,
+                      after: item.photoAfter,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PhotoThumb(
+                          path: item.photoAfter,
+                          size: 56,
+                          semanticLabel: 'Foto después',
+                        ),
+                        const SizedBox(height: 2),
+                        Text('Después', style: t.caption),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+          if (item.application != null &&
+              item.application!.needsFollowUp &&
+              item.application!.followUpVerdict == null) ...[
+            const SizedBox(height: AppSpace.md),
+            AppButton.secondary(
+              label: 'Evaluar reacción',
+              icon: AppIcons.check,
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => FollowUpFormView(application: item.application!),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+

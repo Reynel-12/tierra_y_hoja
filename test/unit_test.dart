@@ -1,8 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tierra_y_hoja/core/database/data_changes.dart';
+import 'package:tierra_y_hoja/core/design/app_colors.dart';
 import 'package:tierra_y_hoja/core/utils/formatters.dart';
 import 'package:tierra_y_hoja/core/utils/validators.dart';
 import 'package:tierra_y_hoja/features/costs/models/cost_models.dart';
+import 'package:tierra_y_hoja/features/cycles/controllers/cycle_controllers.dart';
+import 'package:tierra_y_hoja/features/cycles/data/cycle_repository.dart';
 import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
+import 'package:tierra_y_hoja/features/history/data/history_repository.dart';
+import 'package:tierra_y_hoja/features/history/models/experience_models.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
 import 'package:tierra_y_hoja/features/tour/models/tour_step_data.dart';
 
@@ -126,4 +132,149 @@ void main() {
       }
     });
   });
+
+  group('Memory Models & Pagination', () {
+    test('TimelineEventType contains todos and cosecha options', () {
+      expect(TimelineEventType.values.contains(TimelineEventType.todos), isTrue);
+      expect(TimelineEventType.values.contains(TimelineEventType.cosecha), isTrue);
+      expect(TimelineEventType.todos.label, 'Todos los eventos');
+      expect(TimelineEventType.cosecha.label, 'Cosechas y cierres');
+    });
+
+    test('PaginatedResult properly holds pagination metadata', () {
+      const result = PaginatedResult<String>(
+        items: ['Evento 1', 'Evento 2'],
+        totalCount: 5,
+        hasMore: true,
+      );
+
+      expect(result.items.length, 2);
+      expect(result.totalCount, 5);
+      expect(result.hasMore, isTrue);
+    });
+
+    test('LearningResult assigns icon and color according to event type', () {
+      final now = DateTime.now();
+      const colors = AppColors.light;
+
+      final itemInsumo = LearningResult(
+        crop: 'Tomate',
+        plotName: 'Lote 1',
+        date: now,
+        title: 'Urea',
+        category: 'Insumo',
+        type: TimelineEventType.insumo,
+      );
+      expect(itemInsumo.color(colors), colors.primary);
+
+      final itemLabor = LearningResult(
+        crop: 'Tomate',
+        plotName: 'Lote 1',
+        date: now,
+        title: 'Deshierbe',
+        category: 'Labor',
+        type: TimelineEventType.labor,
+      );
+      expect(itemLabor.color(colors), colors.accentText);
+
+      final itemPlaga = LearningResult(
+        crop: 'Tomate',
+        plotName: 'Lote 1',
+        date: now,
+        title: 'Gusano',
+        category: 'Plaga',
+        type: TimelineEventType.plaga,
+      );
+      expect(itemPlaga.color(colors), colors.negative);
+
+      final itemCosecha = LearningResult(
+        crop: 'Tomate',
+        plotName: 'Lote 1',
+        date: now,
+        title: 'Cosecha final',
+        category: 'Cosecha',
+        type: TimelineEventType.cosecha,
+      );
+      expect(itemCosecha.color(colors), colors.positive);
+    });
+  });
+
+  group('CycleDetailController Events Filtering', () {
+    test('filteredEvents filters items according to selected category', () {
+      final now = DateTime.now();
+      final controller = CycleDetailController(
+        1,
+        _FakeCycleRepoForTest(),
+        _FakeHistoryRepoForTest(),
+        DataChanges(),
+      );
+
+      controller.events = [
+        UnifiedTimelineItem(
+          id: 1,
+          type: TimelineEventType.insumo,
+          cycleId: 1,
+          title: 'Fertilizante Urea',
+          date: now,
+        ),
+        UnifiedTimelineItem(
+          id: 2,
+          type: TimelineEventType.labor,
+          cycleId: 1,
+          title: 'Aporco',
+          date: now,
+        ),
+        UnifiedTimelineItem(
+          id: 3,
+          type: TimelineEventType.plaga,
+          cycleId: 1,
+          title: 'Roya',
+          date: now,
+        ),
+      ];
+
+      // Default: todos
+      expect(controller.selectedFilter, TimelineEventType.todos);
+      expect(controller.filteredEvents.length, 3);
+
+      // Filter by insumo
+      controller.setFilter(TimelineEventType.insumo);
+      expect(controller.filteredEvents.length, 1);
+      expect(controller.filteredEvents.first.title, 'Fertilizante Urea');
+
+      // Filter by labor
+      controller.setFilter(TimelineEventType.labor);
+      expect(controller.filteredEvents.length, 1);
+      expect(controller.filteredEvents.first.title, 'Aporco');
+
+      // Filter by plaga
+      controller.setFilter(TimelineEventType.plaga);
+      expect(controller.filteredEvents.length, 1);
+      expect(controller.filteredEvents.first.title, 'Roya');
+
+      // Return to todos
+      controller.setFilter(TimelineEventType.todos);
+      expect(controller.filteredEvents.length, 3);
+    });
+  });
 }
+
+class _FakeCycleRepoForTest implements CycleRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<CropCycle?> getById(int id) async => null;
+
+  @override
+  Future<List<StageEvent>> getStageEvents(int cycleId) async => [];
+}
+
+class _FakeHistoryRepoForTest implements HistoryRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<List<UnifiedTimelineItem>> getTimelineForCycle(int cycleId) async => [];
+}
+

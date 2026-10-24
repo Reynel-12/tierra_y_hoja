@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tierra_y_hoja/core/database/data_changes.dart';
@@ -9,7 +10,11 @@ import 'package:tierra_y_hoja/features/costs/data/cost_repository.dart';
 import 'package:tierra_y_hoja/features/costs/views/expense_form_view.dart';
 import 'package:tierra_y_hoja/features/cycles/data/cycle_repository.dart';
 import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
+import 'package:tierra_y_hoja/features/cycles/views/cycle_detail_view.dart';
 import 'package:tierra_y_hoja/features/cycles/views/cycle_form_view.dart';
+import 'package:tierra_y_hoja/features/history/data/history_repository.dart';
+import 'package:tierra_y_hoja/features/history/models/experience_models.dart';
+import 'package:tierra_y_hoja/features/history/views/experience_search_view.dart';
 import 'package:tierra_y_hoja/features/plots/data/plot_repository.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
 import 'package:tierra_y_hoja/features/tour/controllers/guided_tour_controller.dart';
@@ -26,6 +31,69 @@ class FakeCycleRepo implements CycleRepository {
 
   @override
   Future<List<CropCycle>> getAll({bool onlyActive = false}) async => [];
+
+  @override
+  Future<CropCycle?> getById(int id) async => CropCycle(
+        id: id,
+        plotId: 1,
+        crop: 'Tomate',
+        variety: 'Pólder',
+        plantingDate: DateTime.now().subtract(const Duration(days: 20)),
+        stage: CropStage.growth,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        plotName: 'Lote El Rincón',
+      );
+
+  @override
+  Future<List<StageEvent>> getStageEvents(int cycleId) async => [];
+}
+
+class FakeHistoryRepo implements HistoryRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<List<UnifiedTimelineItem>> getTimelineForCycle(int cycleId) async => [
+        UnifiedTimelineItem(
+          id: 1,
+          type: TimelineEventType.insumo,
+          cycleId: cycleId,
+          title: 'Fertilizante Urea',
+          subtitle: 'Dosis: 2 copas/bomba',
+          date: DateTime.now(),
+        ),
+        UnifiedTimelineItem(
+          id: 2,
+          type: TimelineEventType.labor,
+          cycleId: cycleId,
+          title: 'Deshierbe manual',
+          date: DateTime.now(),
+        ),
+      ];
+
+  @override
+  Future<PaginatedResult<LearningResult>> getMemoryEventsPaginated({
+    TimelineEventType filter = TimelineEventType.todos,
+    String query = '',
+    int limit = 15,
+    int offset = 0,
+  }) async =>
+      PaginatedResult<LearningResult>(
+        items: [
+          LearningResult(
+            crop: 'Tomate',
+            plotName: 'Lote El Rincón',
+            date: DateTime.now(),
+            title: 'Fertilizante Urea',
+            category: 'Insumo / Tratamiento',
+            type: TimelineEventType.insumo,
+            cycleId: 1,
+          ),
+        ],
+        totalCount: 20,
+        hasMore: true,
+      );
 }
 
 class FakePlotRepo implements PlotRepository {
@@ -37,6 +105,10 @@ class FakePlotRepo implements PlotRepository {
 }
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('es', null);
+  });
+
   testWidgets('CycleFormView renders fields properly and BottomActionBar is constrained at bottom', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
@@ -198,9 +270,9 @@ void main() {
     expect(find.text('Paso 9 de 9'), findsOneWidget);
     expect(find.text('Pantalla de Inicio y Acceso Rápido'), findsOneWidget);
     // Test a simulated demo FAB action
-    await tester.ensureVisible(find.text('🧪 Insumo'));
+    await tester.ensureVisible(find.text('Insumo'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('🧪 Insumo'));
+    await tester.tap(find.text('Insumo'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.textContaining('Acceso directo a: Registrar Insumo.'), findsOneWidget);
@@ -214,4 +286,90 @@ void main() {
     await tester.pumpAndSettle();
     expect(tourController.isCompleted, isTrue);
   });
+
+  testWidgets('ExperienceSearchView renders category filter chips including Todos and Cargar más datos button', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<HistoryRepository>(create: (_) => FakeHistoryRepo()),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ExperienceSearchView(),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    // Verify search field and top bar title
+    expect(find.text('Memoria y Experiencias'), findsOneWidget);
+    expect(find.textContaining('Buscar insumo'), findsOneWidget);
+
+    // Verify filter chips: Todos, Insumos, Labores, Plagas / Clima, Cosechas
+    expect(find.text('Todos'), findsOneWidget);
+    expect(find.text('Insumos'), findsOneWidget);
+    expect(find.text('Labores'), findsOneWidget);
+    expect(find.text('Plagas / Clima'), findsOneWidget);
+    expect(find.text('Cosechas'), findsOneWidget);
+
+    // Verify event card is rendered
+    expect(find.text('Fertilizante Urea'), findsOneWidget);
+    expect(find.textContaining('Lote: Lote El Rincón'), findsOneWidget);
+
+    // Verify "Cargar más datos" button is rendered since hasMore is true
+    expect(find.text('Cargar más datos'), findsOneWidget);
+  });
+
+  testWidgets('CycleDetailView renders events section and category chips within planting screen', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<CycleRepository>(create: (_) => FakeCycleRepo()),
+          Provider<HistoryRepository>(create: (_) => FakeHistoryRepo()),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const CycleDetailView(cycleId: 1),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    // Verify cycle info
+    expect(find.text('Tomate Pólder'), findsOneWidget);
+
+    // Verify events section header is rendered right on this planting screen
+    expect(find.textContaining('EVENTOS DE ESTA SIEMBRA (2)'), findsOneWidget);
+
+    // Verify filter chips within planting screen
+    expect(find.text('Todos (2)'), findsOneWidget);
+    expect(find.text('Insumos (1)'), findsOneWidget);
+    expect(find.text('Labores (1)'), findsOneWidget);
+    expect(find.text('Plagas (0)'), findsOneWidget);
+
+    // Verify events cards are rendered on this screen
+    expect(find.text('Fertilizante Urea'), findsOneWidget);
+    expect(find.text('Deshierbe manual'), findsOneWidget);
+
+    // Tap Insumos filter chip
+    await tester.tap(find.text('Insumos (1)'));
+    await tester.pumpAndSettle();
+
+    // Now only Insumo is visible, Deshierbe manual is filtered out
+    expect(find.text('Fertilizante Urea'), findsOneWidget);
+    expect(find.text('Deshierbe manual'), findsNothing);
+  });
 }
+

@@ -161,6 +161,7 @@ class _CycleTimelineContent extends StatelessWidget {
         TimelineEventType.labor => c.secondarySoft,
         TimelineEventType.plaga => c.negativeSoft,
         TimelineEventType.etapa => c.accentSoft,
+        TimelineEventType.cosecha => c.positiveSoft,
         _ => c.surfaceRaised,
       };
 
@@ -169,9 +170,11 @@ class _CycleTimelineContent extends StatelessWidget {
         TimelineEventType.labor => c.onSecondarySoft,
         TimelineEventType.plaga => c.onNegativeSoft,
         TimelineEventType.etapa => c.onAccentSoft,
+        TimelineEventType.cosecha => c.onPositiveSoft,
         _ => c.ink,
       };
 }
+
 
 class _TimelineCard extends StatelessWidget {
   const _TimelineCard({required this.item});

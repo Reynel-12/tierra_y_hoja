@@ -46,6 +46,19 @@ Calidad general percibida (Primera, segunda, descarte/merma).
 
 Evaluación general del ciclo (notas de qué funcionó y qué falló).
 
+Visualización Integrada de Eventos y Bitácora en Pantalla de Siembra:
+
+Historial y bitácora unificada accesible directamente dentro de la ficha de detalle de cada siembra:
+
+- Visualización inmediata de todos los eventos registrados para el cultivo específico (aplicaciones de insumos, labores culturales mecánicas o manuales, incidencias de plagas o clima y cambios de etapas fenológicas) para tener la información a mano sin requerir ir a la pantalla de Memoria.
+
+- Filtros rápidos por categoría dentro de la misma pantalla (Todos, Insumos, Labores, Plagas/Clima) para consultar ágilmente lo realizado en el lote.
+
+- Tarjetas detalladas de cada evento con fecha, dosis aplicada, personal involucrado, notas de campo, registro fotográfico (antes/después) y botón directo para evaluar la reacción post-aplicación.
+
+- Acceso directo a la línea de tiempo cronológica completa y exportación de la bitácora en formato PDF para compartir con técnicos o cooperativas.
+
+
 3. Módulo de Bitácora de Campo y Manejo de Insumos
 Es el registro diario o semanal de todo lo que se le hace al cultivo. Cada entrada en la bitácora debe ser rápida de crear.
 

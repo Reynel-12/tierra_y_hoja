@@ -5,6 +5,8 @@ import '../../../core/database/db_schema.dart';
 import '../../../core/state/base_controllers.dart';
 import '../../../core/state/view_state.dart';
 import '../../../core/utils/formatters.dart';
+import '../../history/data/history_repository.dart';
+import '../../history/models/experience_models.dart';
 import '../../plots/data/plot_repository.dart';
 import '../../plots/models/plot.dart';
 import '../data/cycle_repository.dart';
@@ -53,8 +55,12 @@ class CycleListController extends LoadableController<List<CropCycle>> {
 }
 
 class CycleDetailController extends LoadableController<CropCycle?> {
-  CycleDetailController(this.cycleId, this._repository, DataChanges changes)
-      : super(changes, watch: {
+  CycleDetailController(
+    this.cycleId,
+    this._repository,
+    this._historyRepository,
+    DataChanges changes,
+  ) : super(changes, watch: {
           DbTable.cycles,
           DbTable.plots,
           DbTable.applications,
@@ -69,13 +75,29 @@ class CycleDetailController extends LoadableController<CropCycle?> {
 
   final int cycleId;
   final CycleRepository _repository;
+  final HistoryRepository _historyRepository;
   List<StageEvent> stageEvents = [];
+  List<UnifiedTimelineItem> events = [];
+
+  TimelineEventType _selectedFilter = TimelineEventType.todos;
+  TimelineEventType get selectedFilter => _selectedFilter;
+
+  void setFilter(TimelineEventType filter) {
+    _selectedFilter = filter;
+    notify();
+  }
+
+  List<UnifiedTimelineItem> get filteredEvents {
+    if (_selectedFilter == TimelineEventType.todos) return events;
+    return events.where((e) => e.type == _selectedFilter).toList();
+  }
 
   @override
   Future<CropCycle?> fetch() async {
     final cycle = await _repository.getById(cycleId);
     if (cycle != null) {
       stageEvents = await _repository.getStageEvents(cycleId);
+      events = await _historyRepository.getTimelineForCycle(cycleId);
     }
     return cycle;
   }
@@ -93,6 +115,7 @@ class CycleDetailController extends LoadableController<CropCycle?> {
     }
   }
 }
+
 
 class CycleFormController extends FormController {
   CycleFormController(
