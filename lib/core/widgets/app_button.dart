@@ -84,10 +84,9 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.c;
     final t = context.t;
-    final height =
-        variant == AppButtonVariant.text ? AppSize.touch : AppSize.primaryAction;
-    final minimumSize =
-        expand ? Size.fromHeight(height) : Size(AppSize.touch, height);
+    final height = variant == AppButtonVariant.text
+        ? AppSize.touch
+        : AppSize.primaryAction;
     final action = loading ? null : onPressed;
 
     final foreground = switch (variant) {
@@ -109,55 +108,63 @@ class AppButton extends StatelessWidget {
         ? t.label
         : t.label.copyWith(fontSize: 16);
 
-    return switch (variant) {
+    final minimumSize = Size(AppSize.touch, height);
+
+    final button = switch (variant) {
       AppButtonVariant.primary => FilledButton(
-          onPressed: action,
-          style: FilledButton.styleFrom(
-            minimumSize: minimumSize,
-            textStyle: textStyle,
-          ),
-          child: content,
+        onPressed: action,
+        style: FilledButton.styleFrom(
+          minimumSize: minimumSize,
+          textStyle: textStyle,
         ),
+        child: content,
+      ),
       AppButtonVariant.secondary => FilledButton(
-          onPressed: action,
-          style: FilledButton.styleFrom(
-            minimumSize: minimumSize,
-            backgroundColor: c.primarySoft,
-            foregroundColor: c.onPrimarySoft,
-            disabledBackgroundColor: c.primarySoft.withValues(alpha: 0.38),
-            disabledForegroundColor: c.onPrimarySoft.withValues(alpha: 0.38),
-            textStyle: textStyle,
-          ),
-          child: content,
+        onPressed: action,
+        style: FilledButton.styleFrom(
+          minimumSize: minimumSize,
+          backgroundColor: c.primarySoft,
+          foregroundColor: c.onPrimarySoft,
+          disabledBackgroundColor: c.primarySoft.withValues(alpha: 0.38),
+          disabledForegroundColor: c.onPrimarySoft.withValues(alpha: 0.38),
+          textStyle: textStyle,
         ),
+        child: content,
+      ),
       AppButtonVariant.outline => OutlinedButton(
-          onPressed: action,
-          style: OutlinedButton.styleFrom(
-            minimumSize: minimumSize,
-            textStyle: textStyle,
-          ),
-          child: content,
+        onPressed: action,
+        style: OutlinedButton.styleFrom(
+          minimumSize: minimumSize,
+          textStyle: textStyle,
         ),
+        child: content,
+      ),
       AppButtonVariant.text => TextButton(
-          onPressed: action,
-          style: TextButton.styleFrom(
-            minimumSize: minimumSize,
-            textStyle: textStyle,
-          ),
-          child: content,
+        onPressed: action,
+        style: TextButton.styleFrom(
+          minimumSize: minimumSize,
+          textStyle: textStyle,
         ),
+        child: content,
+      ),
       AppButtonVariant.destructive => FilledButton(
-          onPressed: action,
-          style: FilledButton.styleFrom(
-            minimumSize: minimumSize,
-            backgroundColor: c.negative,
-            foregroundColor: c.paper,
-            disabledBackgroundColor: c.negative.withValues(alpha: 0.38),
-            textStyle: textStyle,
-          ),
-          child: content,
+        onPressed: action,
+        style: FilledButton.styleFrom(
+          minimumSize: minimumSize,
+          backgroundColor: c.negative,
+          foregroundColor: c.paper,
+          disabledBackgroundColor: c.negative.withValues(alpha: 0.38),
+          textStyle: textStyle,
         ),
+        child: content,
+      ),
     };
+
+    if (expand) {
+      return SizedBox(width: double.infinity, child: button);
+    }
+
+    return button;
   }
 }
 

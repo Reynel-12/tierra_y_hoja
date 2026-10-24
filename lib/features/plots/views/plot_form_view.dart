@@ -48,7 +48,8 @@ class _PlotFormContent extends StatelessWidget {
       onSave: controller.save,
       onDelete: controller.isEditing ? controller.delete : null,
       deleteTitle: '¿Eliminar este lote?',
-      deleteMessage: 'Se eliminarán también todos los ciclos y registros asociados a esta tierra.',
+      deleteMessage:
+          'Se eliminarán también todos los ciclos y registros asociados a esta tierra.',
       children: [
         // Datos básicos obligatorios
         FormSection(
@@ -59,7 +60,9 @@ class _PlotFormContent extends StatelessWidget {
               controller: controller.nameController,
               required: true,
               hint: 'ej. El Rincón, Lote Alto, La Vega',
-              validator: Validators.required('Falta el nombre o apodo del lote. Escríbalo para identificarlo.'),
+              validator: Validators.required(
+                'Falta el nombre o apodo del lote. Escríbalo para identificarlo.',
+              ),
             ),
             UnitField<AreaUnit>(
               label: 'Área o extensión',
@@ -69,13 +72,16 @@ class _PlotFormContent extends StatelessWidget {
               unit: controller.selectedAreaUnit,
               onUnitChanged: controller.setAreaUnit,
               hint: 'ej. 2.5',
-              validator: Validators.requiredPositive('Falta el área del lote. Escriba una cantidad mayor a cero.'),
+              validator: Validators.requiredPositive(
+                'Falta el área del lote. Escriba una cantidad mayor a cero.',
+              ),
             ),
             PhotoField(
               label: 'Foto del lote (opcional)',
               path: controller.photoPath,
               onChanged: controller.setPhoto,
-              helper: 'Una foto panorámica ayuda a recordar la ubicación y estado del terreno.',
+              helper:
+                  'Una foto panorámica ayuda a recordar la ubicación y estado del terreno.',
             ),
           ],
         ),
@@ -111,7 +117,8 @@ class _PlotFormContent extends StatelessWidget {
         // Detalles opcionales ocultos tras "Agregar más detalles" (§7.3 y §8 Plantilla C)
         MoreDetails(
           label: 'Agregar ubicación GPS e historial previo',
-          initiallyExpanded: controller.latitude != null ||
+          initiallyExpanded:
+              controller.latitude != null ||
               (controller.previousCropsController.text.isNotEmpty),
           children: [
             LocationField(
@@ -122,8 +129,10 @@ class _PlotFormContent extends StatelessWidget {
             AppTextField.notes(
               label: 'Historial previo (rotación de cultivos)',
               controller: controller.previousCropsController,
-              hint: '¿Qué cultivo estuvo sembrado antes en esta tierra? Notas de plagas anteriores...',
-              helper: 'Clave para planificar rotación y evitar enfermedades del suelo.',
+              hint:
+                  '¿Qué cultivo estuvo sembrado antes en esta tierra? Notas de plagas anteriores...',
+              helper:
+                  'Clave para planificar rotación y evitar enfermedades del suelo.',
             ),
           ],
         ),

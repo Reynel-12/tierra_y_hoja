@@ -103,10 +103,7 @@ class QuickAddFab extends StatelessWidget {
                 const SizedBox(width: AppSpace.sm),
                 Text(
                   label,
-                  style: t.label.copyWith(
-                    color: c.onPrimary,
-                    fontSize: 16,
-                  ),
+                  style: t.label.copyWith(color: c.onPrimary, fontSize: 16),
                 ),
               ],
             ),

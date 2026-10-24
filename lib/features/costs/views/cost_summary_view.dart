@@ -24,11 +24,7 @@ import 'sale_form_view.dart';
 
 /// Plantilla E: Balance Económico y Finanzas Agrícolas.
 class CostSummaryView extends StatelessWidget {
-  const CostSummaryView({
-    super.key,
-    this.cycleId,
-    this.cropTitle,
-  });
+  const CostSummaryView({super.key, this.cycleId, this.cropTitle});
 
   final int? cycleId;
   final String? cropTitle;
@@ -105,9 +101,7 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
         : 'Costos y Finanzas';
 
     return Scaffold(
-      appBar: AppTopBar(
-        title: title,
-      ),
+      appBar: AppTopBar(title: title),
       body: ViewStateBuilder<CostSummaryData>(
         state: controller.state,
         onRetry: () => controller.load(),
@@ -128,7 +122,8 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                     label: summary.isProfitable
                         ? 'Ganancia neta acumulada'
                         : 'Balance actual (en inversión)',
-                    caption: 'Ventas menos costos de insumos, jornales y fletes',
+                    caption:
+                        'Ventas menos costos de insumos, jornales y fletes',
                     valueColor: summary.isProfitable ? c.positive : c.ink,
                   ),
                   const SizedBox(height: AppSpace.lg),
@@ -171,9 +166,8 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                           icon: AppIcons.check,
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => SaleFormView(
-                                initialCycleId: widget.cycleId,
-                              ),
+                              builder: (_) =>
+                                  SaleFormView(initialCycleId: widget.cycleId),
                             ),
                           ),
                         ),
@@ -233,7 +227,8 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                       const EmptyState(
                         icon: AppIcons.receipt,
                         title: 'Sin gastos registrados',
-                        message: 'Presione "Registrar gasto" para llevar el control de insumos y jornales.',
+                        message:
+                            'Presione "Registrar gasto" para llevar el control de insumos y jornales.',
                       )
                     else
                       for (final expense in expenses)
@@ -241,6 +236,7 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                           padding: const EdgeInsets.only(bottom: AppSpace.sm),
                           child: AppCard(
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CircleIcon(
                                   icon: expense.category.icon,
@@ -249,36 +245,53 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                                 const SizedBox(width: AppSpace.md),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        expense.title,
-                                        style: t.titleSm,
-                                      ),
+                                      Text(expense.title, style: t.titleSm),
                                       const SizedBox(height: 2),
                                       Text(
                                         '${expense.cropTitle} · ${Formatters.date(expense.date)}',
                                         style: t.bodySm,
                                       ),
-                                      if (expense.quantity != null && expense.unitPrice != null)
+                                      if (expense.quantity != null &&
+                                          expense.unitPrice != null) ...[
+                                        const SizedBox(height: 2),
                                         Text(
                                           '${Formatters.editable(expense.quantity)} un. × ${Formatters.money(expense.unitPrice!)}',
                                           style: t.caption,
                                         ),
+                                      ],
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: AppSpace.sm),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      expense.amountDisplay,
-                                      style: t.numericLg,
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 130,
+                                      ),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          expense.amountDisplay,
+                                          style: t.title.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(AppIcons.delete, size: AppSize.iconSm),
+                                      icon: const Icon(
+                                        AppIcons.delete,
+                                        size: AppSize.iconSm,
+                                      ),
                                       color: c.negative,
                                       tooltip: 'Eliminar gasto',
+                                      visualDensity: VisualDensity.compact,
                                       onPressed: () => _confirmDeleteExpense(
                                         context,
                                         controller,
@@ -296,7 +309,8 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                       const EmptyState(
                         icon: AppIcons.check,
                         title: 'Sin ventas registradas',
-                        message: 'Presione "Registrar venta" cuando empiece a comercializar la cosecha.',
+                        message:
+                            'Presione "Registrar venta" cuando empiece a comercializar la cosecha.',
                       )
                     else
                       for (final sale in sales)
@@ -304,6 +318,7 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                           padding: const EdgeInsets.only(bottom: AppSpace.sm),
                           child: AppCard(
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CircleIcon(
                                   icon: AppIcons.check,
@@ -312,10 +327,12 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                                 const SizedBox(width: AppSpace.md),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        sale.buyer != null && sale.buyer!.isNotEmpty
+                                        sale.buyer != null &&
+                                                sale.buyer!.isNotEmpty
                                             ? 'Venta a ${sale.buyer}'
                                             : 'Venta de cosecha',
                                         style: t.titleSm,
@@ -325,25 +342,44 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                                         '${sale.cropTitle} · ${Formatters.date(sale.date)}',
                                         style: t.bodySm,
                                       ),
-                                      if (sale.quantity != null)
+                                      if (sale.quantity != null) ...[
+                                        const SizedBox(height: 2),
                                         Text(
                                           '${Formatters.editable(sale.quantity)} ${sale.unit ?? ''}',
                                           style: t.caption,
                                         ),
+                                      ],
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: AppSpace.sm),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      '+ ${sale.amountDisplay}',
-                                      style: t.numericLg.copyWith(color: c.positive),
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(
+                                        maxWidth: 130,
+                                      ),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          '+ ${sale.amountDisplay}',
+                                          style: t.title.copyWith(
+                                            color: c.positive,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(AppIcons.delete, size: AppSize.iconSm),
+                                      icon: const Icon(
+                                        AppIcons.delete,
+                                        size: AppSize.iconSm,
+                                      ),
                                       color: c.negative,
                                       tooltip: 'Eliminar venta',
+                                      visualDensity: VisualDensity.compact,
                                       onPressed: () => _confirmDeleteSale(
                                         context,
                                         controller,
@@ -382,28 +418,33 @@ class _CategoryProgressRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = context.t;
     final percent = total > 0 ? (amount / total) : 0.0;
+    final percentText = '${(percent * 100).toStringAsFixed(1)}%';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(category.icon, size: AppSize.iconSm),
-                const SizedBox(width: AppSpace.sm),
-                Text(category.label, style: t.body),
-              ],
-            ),
-            Text(
-              '${Formatters.money(amount)} (${(percent * 100).toStringAsFixed(1)}%)',
-              style: t.label,
+            Icon(category.icon, size: AppSize.iconSm),
+            const SizedBox(width: AppSpace.sm),
+            Expanded(child: Text(category.label, style: t.body)),
+            const SizedBox(width: AppSpace.sm),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 140),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  Formatters.money(amount),
+                  style: t.label.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
             ),
           ],
         ),
         const SizedBox(height: AppSpace.xs),
-        AppProgressBar(progress: percent),
+        AppProgressBar(progress: percent, label: percentText),
       ],
     );
   }

@@ -64,9 +64,7 @@ class _HomeContent extends StatelessWidget {
             tooltip: 'Balance económico',
             icon: const Icon(AppIcons.money),
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const CostSummaryView(),
-              ),
+              MaterialPageRoute<void>(builder: (_) => const CostSummaryView()),
             ),
           ),
         ],
@@ -90,10 +88,7 @@ class _HomeContent extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Saludo y Fecha
-                  ScreenTitle(
-                    'Mi Finca y Cultivos',
-                    subtitle: dateString,
-                  ),
+                  ScreenTitle('Mi Finca y Cultivos', subtitle: dateString),
                   const SizedBox(height: AppSpace.md),
 
                   // Banner 100% Offline
@@ -109,7 +104,11 @@ class _HomeContent extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Icon(AppIcons.clock, color: c.accent, size: AppSize.iconMd),
+                              Icon(
+                                AppIcons.clock,
+                                color: c.accent,
+                                size: AppSize.iconMd,
+                              ),
                               const SizedBox(width: AppSpace.sm),
                               Expanded(
                                 child: Text(
@@ -150,10 +149,10 @@ class _HomeContent extends StatelessWidget {
                     actionLabel: activeCycles.isNotEmpty ? 'Ver todas' : null,
                     onAction: activeCycles.isNotEmpty
                         ? () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const CycleListView(),
-                              ),
-                            )
+                            MaterialPageRoute<void>(
+                              builder: (_) => const CycleListView(),
+                            ),
+                          )
                         : null,
                   ),
                   if (activeCycles.isEmpty)
@@ -161,7 +160,10 @@ class _HomeContent extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('No hay siembras activas en este momento', style: t.titleSm),
+                          Text(
+                            'No hay siembras activas en este momento',
+                            style: t.titleSm,
+                          ),
                           const SizedBox(height: AppSpace.xs),
                           Text(
                             'Inicie un ciclo para comenzar a llevar el registro de aplicaciones, labores y cosechas de sus lotes.',
@@ -174,7 +176,10 @@ class _HomeContent extends StatelessWidget {
                                 builder: (_) => const CycleFormView(),
                               ),
                             ),
-                            icon: const Icon(AppIcons.plus, size: AppSize.iconSm),
+                            icon: const Icon(
+                              AppIcons.plus,
+                              size: AppSize.iconSm,
+                            ),
                             label: const Text('Abrir nueva siembra'),
                           ),
                         ],
@@ -228,18 +233,27 @@ class _HomeContent extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Balance económico acumulado', style: t.label),
+                              Text(
+                                'Balance económico acumulado',
+                                style: t.label,
+                              ),
                               const SizedBox(height: 2),
                               Text(
                                 Formatters.money(finances.netProfit),
                                 style: t.title.copyWith(
-                                  color: finances.isProfitable ? c.positive : c.ink,
+                                  color: finances.isProfitable
+                                      ? c.positive
+                                      : c.ink,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(AppIcons.forward, size: AppSize.iconSm, color: c.inkMuted),
+                        Icon(
+                          AppIcons.forward,
+                          size: AppSize.iconSm,
+                          color: c.inkMuted,
+                        ),
                       ],
                     ),
                   ),

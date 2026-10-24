@@ -33,7 +33,7 @@ class PhotoThumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (path == null) {
+    if (path == null || path!.trim().isEmpty) {
       return SizedBox(width: size, height: size / aspectRatio);
     }
     final dpr = MediaQuery.devicePixelRatioOf(context);
@@ -52,6 +52,64 @@ class PhotoThumb extends StatelessWidget {
             color: c.surfaceAlt,
             child: Icon(AppIcons.image, color: c.inkMuted),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Miniatura compacta con etiqueta pill ("Antes" / "Después") y marco sutil.
+/// Al tocar abre el visor completo o ejecuta su callback.
+class PhotoPreviewThumb extends StatelessWidget {
+  const PhotoPreviewThumb({
+    super.key,
+    required this.path,
+    required this.label,
+    this.size = 56,
+    this.onTap,
+  });
+
+  final String path;
+  final String label;
+  final double size;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final t = context.t;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.xs),
+          border: Border.all(color: c.outline, width: 1),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            PhotoThumb(
+              path: path,
+              size: size,
+              radius: AppRadius.xs,
+              semanticLabel: 'Foto $label',
+            ),
+            Container(
+              width: size,
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              color: c.ink.withValues(alpha: 0.75),
+              child: Text(
+                label,
+                style: t.caption.copyWith(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -147,8 +205,10 @@ class _SourceTile extends StatelessWidget {
             Container(
               width: AppSize.touch,
               height: AppSize.touch,
-              decoration:
-                  BoxDecoration(color: c.primarySoft, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: c.primarySoft,
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, color: c.onPrimarySoft),
             ),
             const SizedBox(width: AppSpace.lg),
@@ -216,7 +276,11 @@ class PhotoField extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(AppIcons.photo, color: c.primary, size: AppSize.iconLg),
+                    Icon(
+                      AppIcons.photo,
+                      color: c.primary,
+                      size: AppSize.iconLg,
+                    ),
                     const SizedBox(height: AppSpace.xs),
                     Text('Agregar foto', style: t.label),
                   ],
@@ -430,6 +494,9 @@ class _PhotoViewerPageState extends State<PhotoViewerPage> {
               File(after),
               fit: BoxFit.contain,
               semanticLabel: 'Foto después',
+              errorBuilder: (_, _, _) => Center(
+                child: Icon(AppIcons.image, size: 48, color: c.inkMuted),
+              ),
             ),
             ClipRect(
               clipper: _SplitClipper(_split),
@@ -437,6 +504,9 @@ class _PhotoViewerPageState extends State<PhotoViewerPage> {
                 File(before),
                 fit: BoxFit.contain,
                 semanticLabel: 'Foto antes',
+                errorBuilder: (_, _, _) => Center(
+                  child: Icon(AppIcons.image, size: 48, color: c.inkMuted),
+                ),
               ),
             ),
             Positioned(
@@ -456,6 +526,9 @@ class _PhotoViewerPageState extends State<PhotoViewerPage> {
             File(before ?? after ?? ''),
             fit: BoxFit.contain,
             semanticLabel: 'Foto',
+            errorBuilder: (_, _, _) => Center(
+              child: Icon(AppIcons.image, size: 48, color: c.inkMuted),
+            ),
           ),
         ),
       );

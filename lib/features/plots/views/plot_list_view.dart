@@ -82,7 +82,8 @@ class _PlotListContentState extends State<_PlotListContent> {
               child: EmptyState(
                 icon: AppIcons.plot,
                 title: 'Aún no tiene parcelas registradas',
-                message: 'Registre su primer lote o pedazo de tierra para abrir siembras.',
+                message:
+                    'Registre su primer lote o pedazo de tierra para abrir siembras.',
                 actionLabel: 'Registrar lote',
                 onAction: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(builder: (_) => const PlotFormView()),
@@ -92,7 +93,12 @@ class _PlotListContentState extends State<_PlotListContent> {
           }
 
           return ListView(
-            padding: EdgeInsets.fromLTRB(pad, AppSpace.sm, pad, AppSpace.x4 * 2),
+            padding: EdgeInsets.fromLTRB(
+              pad,
+              AppSpace.sm,
+              pad,
+              AppSpace.x4 * 2,
+            ),
             children: [
               ContentWidth(
                 child: AppSearchField(
@@ -118,7 +124,8 @@ class _PlotListContentState extends State<_PlotListContent> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: AppSpace.listGap),
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: AppSpace.listGap),
                     itemBuilder: (context, index) {
                       final plot = filtered[index];
                       return StaggeredEntry(
@@ -164,7 +171,9 @@ class _PlotCard extends StatelessWidget {
         children: [
           if (plot.photoPath != null)
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppRadius.lg),
+              ),
               child: PhotoBanner(
                 path: plot.photoPath!,
                 aspectRatio: 16 / 9,

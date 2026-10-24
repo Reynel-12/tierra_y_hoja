@@ -69,7 +69,11 @@ class CulturalTask {
     return CulturalTask(
       id: row.integerOrNull('id'),
       cycleId: row.integer('cycle_id'),
-      taskType: enumFromName(TaskType.values, row['task_type'], TaskType.preparacionTierra),
+      taskType: enumFromName(
+        TaskType.values,
+        row['task_type'],
+        TaskType.preparacionTierra,
+      ),
       method: row.textOrNull('method'),
       date: row.date('date'),
       irrigationHours: row.decimalOrNull('irrigation_hours'),
@@ -131,10 +135,10 @@ enum IncidentSeverity implements ChoiceOption {
   final IconData icon;
 
   Color color(AppColors c) => switch (this) {
-        IncidentSeverity.leve => c.neutral,
-        IncidentSeverity.moderada => c.accentText,
-        IncidentSeverity.critica => c.negative,
-      };
+    IncidentSeverity.leve => c.neutral,
+    IncidentSeverity.moderada => c.accentText,
+    IncidentSeverity.critica => c.negative,
+  };
 }
 
 /// Registro de una incidencia, plaga o evento climático.
@@ -181,7 +185,11 @@ class Incident {
       cycleId: row.integer('cycle_id'),
       kind: enumFromName(IncidentKind.values, row['kind'], IncidentKind.plaga),
       name: row.text('name'),
-      severity: enumFromName(IncidentSeverity.values, row['severity'], IncidentSeverity.moderada),
+      severity: enumFromName(
+        IncidentSeverity.values,
+        row['severity'],
+        IncidentSeverity.moderada,
+      ),
       date: row.date('date'),
       actionTaken: row.textOrNull('action_taken'),
       notes: row.textOrNull('notes'),

@@ -31,13 +31,16 @@ class HomeController extends LoadableController<HomeDashboardData> {
     this._applicationRepository,
     this._costRepository,
     DataChanges changes,
-  ) : super(changes, watch: {
+  ) : super(
+        changes,
+        watch: {
           DbTable.cycles,
           DbTable.plots,
           DbTable.applications,
           DbTable.expenses,
           DbTable.sales,
-        }) {
+        },
+      ) {
     load();
   }
 

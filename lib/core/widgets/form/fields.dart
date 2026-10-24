@@ -86,13 +86,13 @@ class AppTextField extends StatelessWidget {
     this.suffixText,
     this.onChanged,
     this.textInputAction = TextInputAction.next,
-  })  : keyboardType = numberKeyboard,
-        maxLines = 1,
-        minLines = null,
-        enableVoice = false,
-        textCapitalization = TextCapitalization.none,
-        maxLength = 12,
-        inputFormatters = null;
+  }) : keyboardType = numberKeyboard,
+       maxLines = 1,
+       minLines = null,
+       enableVoice = false,
+       textCapitalization = TextCapitalization.none,
+       maxLength = 12,
+       inputFormatters = null;
 
   /// Campo de notas multilínea con dictado por voz.
   const AppTextField.notes({
@@ -104,16 +104,16 @@ class AppTextField extends StatelessWidget {
     this.helper,
     this.validator,
     this.onChanged,
-  })  : keyboardType = TextInputType.multiline,
-        maxLines = 6,
-        minLines = 3,
-        enableVoice = true,
-        textCapitalization = TextCapitalization.sentences,
-        textInputAction = TextInputAction.newline,
-        prefixText = null,
-        suffixText = null,
-        maxLength = null,
-        inputFormatters = null;
+  }) : keyboardType = TextInputType.multiline,
+       maxLines = 6,
+       minLines = 3,
+       enableVoice = true,
+       textCapitalization = TextCapitalization.sentences,
+       textInputAction = TextInputAction.newline,
+       prefixText = null,
+       suffixText = null,
+       maxLength = null,
+       inputFormatters = null;
 
   final String label;
   final TextEditingController controller;
@@ -151,7 +151,8 @@ class AppTextField extends StatelessWidget {
           maxLines: maxLines,
           minLines: minLines,
           maxLength: maxLength,
-          textInputAction: textInputAction ??
+          textInputAction:
+              textInputAction ??
               (maxLines > 1 ? TextInputAction.newline : TextInputAction.next),
           textCapitalization: textCapitalization,
           style: context.t.body,
@@ -283,8 +284,11 @@ class UnitField<U extends ChoiceOption> extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: AppSpace.xs),
-                      Icon(AppIcons.expand,
-                          size: AppSize.iconBadge, color: c.inkSoft),
+                      Icon(
+                        AppIcons.expand,
+                        size: AppSize.iconBadge,
+                        color: c.inkSoft,
+                      ),
                     ],
                   ),
                 ),

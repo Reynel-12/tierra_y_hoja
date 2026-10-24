@@ -21,10 +21,7 @@ import 'tour_step_simulators.dart';
 /// con explicaciones claras, ubicación de cada pantalla, tipos de datos
 /// e interactivos simuladores que no alteran la base de datos local.
 class GuidedTourView extends StatefulWidget {
-  const GuidedTourView({
-    super.key,
-    this.isRevisit = false,
-  });
+  const GuidedTourView({super.key, this.isRevisit = false});
 
   /// Indica si el usuario está revisando el tour desde la sección de ajustes
   /// o si es su primera vez abriendo la aplicación.
@@ -73,7 +70,10 @@ class _GuidedTourViewState extends State<GuidedTourView> {
     }
   }
 
-  void _onSkipTour(BuildContext context, GuidedTourController controller) async {
+  void _onSkipTour(
+    BuildContext context,
+    GuidedTourController controller,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -103,7 +103,10 @@ class _GuidedTourViewState extends State<GuidedTourView> {
     }
   }
 
-  void _onFinishTour(BuildContext context, GuidedTourController controller) async {
+  void _onFinishTour(
+    BuildContext context,
+    GuidedTourController controller,
+  ) async {
     if (widget.isRevisit) {
       Navigator.of(context).pop();
     } else {
@@ -113,7 +116,10 @@ class _GuidedTourViewState extends State<GuidedTourView> {
           SnackBar(
             content: const Text(
               '¡Listo! La aplicación está configurada para guardar sus registros reales.',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             backgroundColor: context.c.primary,
             behavior: SnackBarBehavior.floating,
@@ -162,7 +168,10 @@ class _GuidedTourViewState extends State<GuidedTourView> {
             // Barra de progreso y pasos
             Container(
               color: c.surface,
-              padding: EdgeInsets.symmetric(horizontal: pad, vertical: AppSpace.sm),
+              padding: EdgeInsets.symmetric(
+                horizontal: pad,
+                vertical: AppSpace.sm,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -171,7 +180,10 @@ class _GuidedTourViewState extends State<GuidedTourView> {
                     children: [
                       Text(
                         'Paso ${stepIndex + 1} de $totalSteps',
-                        style: t.label.copyWith(color: c.primary, fontWeight: FontWeight.bold),
+                        style: t.label.copyWith(
+                          color: c.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(width: AppSpace.sm),
                       Flexible(
@@ -233,7 +245,12 @@ class _GuidedTourViewState extends State<GuidedTourView> {
             Expanded(
               child: SingleChildScrollView(
                 controller: _scrollController,
-                padding: EdgeInsets.fromLTRB(pad, AppSpace.md, pad, AppSpace.x4),
+                padding: EdgeInsets.fromLTRB(
+                  pad,
+                  AppSpace.md,
+                  pad,
+                  AppSpace.x4,
+                ),
                 child: ContentWidth(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -277,10 +294,17 @@ class _GuidedTourViewState extends State<GuidedTourView> {
                           children: [
                             Row(
                               children: [
-                                Icon(AppIcons.clock, size: AppSize.iconSm, color: c.primary),
+                                Icon(
+                                  AppIcons.clock,
+                                  size: AppSize.iconSm,
+                                  color: c.primary,
+                                ),
                                 const SizedBox(width: AppSpace.xs),
                                 Flexible(
-                                  child: Text('¿Por qué en este orden?', style: t.label.copyWith(color: c.primary)),
+                                  child: Text(
+                                    '¿Por qué en este orden?',
+                                    style: t.label.copyWith(color: c.primary),
+                                  ),
                                 ),
                               ],
                             ),
@@ -298,22 +322,41 @@ class _GuidedTourViewState extends State<GuidedTourView> {
                           children: [
                             Row(
                               children: [
-                                Icon(AppIcons.location, size: AppSize.iconSm, color: c.primary),
+                                Icon(
+                                  AppIcons.location,
+                                  size: AppSize.iconSm,
+                                  color: c.primary,
+                                ),
                                 const SizedBox(width: AppSpace.xs),
                                 Flexible(
-                                  child: Text('¿Dónde se ubica en la aplicación?', style: t.label),
+                                  child: Text(
+                                    '¿Dónde se ubica en la aplicación?',
+                                    style: t.label,
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(currentStep.appLocation, style: t.bodySm.copyWith(fontWeight: FontWeight.w600)),
+                            Text(
+                              currentStep.appLocation,
+                              style: t.bodySm.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             const Divider(height: AppSpace.lg),
                             Row(
                               children: [
-                                Icon(AppIcons.lightbulb, size: AppSize.iconSm, color: c.accentText),
+                                Icon(
+                                  AppIcons.lightbulb,
+                                  size: AppSize.iconSm,
+                                  color: c.accentText,
+                                ),
                                 const SizedBox(width: AppSpace.xs),
                                 Flexible(
-                                  child: Text('¿Para qué sirve esta pantalla?', style: t.label),
+                                  child: Text(
+                                    '¿Para qué sirve esta pantalla?',
+                                    style: t.label,
+                                  ),
                                 ),
                               ],
                             ),
@@ -329,12 +372,20 @@ class _GuidedTourViewState extends State<GuidedTourView> {
                       const SizedBox(height: AppSpace.section),
 
                       // RESUMEN DE CAMPOS Y TIPOS DE DATOS ACEPTADOS
-                      const SectionHeader(title: 'Campos y tipos de datos en esta pantalla'),
+                      const SectionHeader(
+                        title: 'Campos y tipos de datos en esta pantalla',
+                      ),
                       AppCard(
                         child: Column(
                           children: [
-                            for (int i = 0; i < currentStep.inputsSummary.length; i++) ...[
-                              _InputFieldSummaryRow(info: currentStep.inputsSummary[i]),
+                            for (
+                              int i = 0;
+                              i < currentStep.inputsSummary.length;
+                              i++
+                            ) ...[
+                              _InputFieldSummaryRow(
+                                info: currentStep.inputsSummary[i],
+                              ),
                               if (i < currentStep.inputsSummary.length - 1)
                                 const Divider(height: AppSpace.md),
                             ],
@@ -357,10 +408,16 @@ class _GuidedTourViewState extends State<GuidedTourView> {
                                 children: [
                                   Text(
                                     'Consejo de campo',
-                                    style: t.label.copyWith(color: c.accentText, fontWeight: FontWeight.bold),
+                                    style: t.label.copyWith(
+                                      color: c.accentText,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
-                                  Text(currentStep.agriculturalTip, style: t.bodySm),
+                                  Text(
+                                    currentStep.agriculturalTip,
+                                    style: t.bodySm,
+                                  ),
                                 ],
                               ),
                             ),
@@ -466,7 +523,10 @@ class _InputFieldSummaryRow extends StatelessWidget {
                   if (info.isRequired)
                     Text(
                       '(Obligatorio)',
-                      style: t.caption.copyWith(color: c.negative, fontWeight: FontWeight.w600),
+                      style: t.caption.copyWith(
+                        color: c.negative,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                 ],
               ),
@@ -479,7 +539,10 @@ class _InputFieldSummaryRow extends StatelessWidget {
                 ),
                 child: Text(
                   'Tipo: ${info.dataType}',
-                  style: t.caption.copyWith(color: c.inkSoft, fontWeight: FontWeight.w600),
+                  style: t.caption.copyWith(
+                    color: c.inkSoft,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: 4),

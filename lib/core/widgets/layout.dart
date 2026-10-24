@@ -67,10 +67,7 @@ class BottomActionBar extends StatelessWidget {
             heightFactor: 1.0,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: AppSize.maxFormWidth),
-              child: SizedBox(
-                width: double.infinity,
-                child: child,
-              ),
+              child: SizedBox(width: double.infinity, child: child),
             ),
           ),
         ),
@@ -127,15 +124,17 @@ class ListRow extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(title, style: t.body),
-                        if (subtitle != null)
-                          Text(subtitle!, style: t.bodySm),
+                        if (subtitle != null) Text(subtitle!, style: t.bodySm),
                       ],
                     ),
                   ),
                   trailing ??
                       (onTap != null
-                          ? Icon(AppIcons.forward,
-                              size: AppSize.iconSm, color: c.inkMuted)
+                          ? Icon(
+                              AppIcons.forward,
+                              size: AppSize.iconSm,
+                              color: c.inkMuted,
+                            )
                           : const SizedBox.shrink()),
                 ],
               ),
@@ -201,8 +200,8 @@ class StaggeredEntry extends StatelessWidget {
   Widget build(BuildContext context) {
     if (index >= _maxAnimated || AppMotion.reduced(context)) return child;
     final duration = AppMotion.base + AppMotion.stagger * index;
-    final start = (AppMotion.stagger * index).inMilliseconds /
-        duration.inMilliseconds;
+    final start =
+        (AppMotion.stagger * index).inMilliseconds / duration.inMilliseconds;
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: duration,

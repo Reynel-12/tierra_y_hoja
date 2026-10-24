@@ -108,14 +108,19 @@ class Plot {
 
   bool get hasCoordinates => latitude != null && longitude != null;
 
-  String get areaDisplay => '${area == area.roundToDouble() ? area.toInt() : area} ${areaUnit.label}';
+  String get areaDisplay =>
+      '${area == area.roundToDouble() ? area.toInt() : area} ${areaUnit.label}';
 
   factory Plot.fromRow(Map<String, Object?> row, {String? activeCropName}) {
     return Plot(
       id: row.integerOrNull('id'),
       name: row.text('name'),
       area: row.decimal('area'),
-      areaUnit: enumFromName(AreaUnit.values, row['area_unit'], AreaUnit.manzanas),
+      areaUnit: enumFromName(
+        AreaUnit.values,
+        row['area_unit'],
+        AreaUnit.manzanas,
+      ),
       latitude: row.decimalOrNull('latitude'),
       longitude: row.decimalOrNull('longitude'),
       soilTexture: enumFromNameOrNull(SoilTexture.values, row['soil_texture']),

@@ -10,14 +10,17 @@ class CostRepository {
 
   // Gastos
   Future<List<Expense>> getExpensesByCycle(int cycleId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT e.*, c.crop as crop_title, p.name as plot_name
       FROM expenses e
       INNER JOIN crop_cycles c ON c.id = e.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE e.cycle_id = ?
       ORDER BY e.date DESC
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     return results.map(Expense.fromRow).toList();
   }
@@ -58,14 +61,17 @@ class CostRepository {
 
   // Ventas
   Future<List<Sale>> getSalesByCycle(int cycleId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT s.*, c.crop as crop_title, p.name as plot_name
       FROM sales s
       INNER JOIN crop_cycles c ON c.id = s.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE s.cycle_id = ?
       ORDER BY s.date DESC
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     return results.map(Sale.fromRow).toList();
   }
@@ -106,29 +112,40 @@ class CostRepository {
 
   // Resumen consolidado para un ciclo específico
   Future<FinancialSummary> getSummaryForCycle(int cycleId) async {
-    final expenseRows = await _database.db.rawQuery('''
+    final expenseRows = await _database.db.rawQuery(
+      '''
       SELECT category, SUM(amount) as total
       FROM expenses
       WHERE cycle_id = ?
       GROUP BY category
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     double totalExpenses = 0.0;
     final byCategory = <ExpenseCategory, double>{};
     for (final row in expenseRows) {
-      final cat = enumFromName(ExpenseCategory.values, row['category'], ExpenseCategory.otros);
+      final cat = enumFromName(
+        ExpenseCategory.values,
+        row['category'],
+        ExpenseCategory.otros,
+      );
       final amt = (row['total'] as num?)?.toDouble() ?? 0.0;
       byCategory[cat] = amt;
       totalExpenses += amt;
     }
 
-    final salesRows = await _database.db.rawQuery('''
+    final salesRows = await _database.db.rawQuery(
+      '''
       SELECT SUM(amount) as total
       FROM sales
       WHERE cycle_id = ?
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
-    final totalSales = (salesRows.firstOrNull?['total'] as num?)?.toDouble() ?? 0.0;
+    final totalSales =
+        (salesRows.firstOrNull?['total'] as num?)?.toDouble() ?? 0.0;
 
     return FinancialSummary(
       totalExpenses: totalExpenses,
@@ -148,7 +165,11 @@ class CostRepository {
     double totalExpenses = 0.0;
     final byCategory = <ExpenseCategory, double>{};
     for (final row in expenseRows) {
-      final cat = enumFromName(ExpenseCategory.values, row['category'], ExpenseCategory.otros);
+      final cat = enumFromName(
+        ExpenseCategory.values,
+        row['category'],
+        ExpenseCategory.otros,
+      );
       final amt = (row['total'] as num?)?.toDouble() ?? 0.0;
       byCategory[cat] = amt;
       totalExpenses += amt;
@@ -159,7 +180,8 @@ class CostRepository {
       FROM sales
     ''');
 
-    final totalSales = (salesRows.firstOrNull?['total'] as num?)?.toDouble() ?? 0.0;
+    final totalSales =
+        (salesRows.firstOrNull?['total'] as num?)?.toDouble() ?? 0.0;
 
     return FinancialSummary(
       totalExpenses: totalExpenses,

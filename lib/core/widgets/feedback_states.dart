@@ -85,11 +85,7 @@ class ErrorState extends StatelessWidget {
             foreground: c.negative,
           ),
           const SizedBox(height: AppSpace.xl),
-          Text(
-            message,
-            style: context.t.body,
-            textAlign: TextAlign.center,
-          ),
+          Text(message, style: context.t.body, textAlign: TextAlign.center),
           if (onRetry != null) ...[
             const SizedBox(height: AppSpace.xl),
             AppButton.outline(
@@ -205,8 +201,9 @@ class ViewStateBuilder<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (state) {
       ViewLoading<T>() => loading ?? const SkeletonList(),
-      ViewError<T>(:final message) =>
-        Center(child: ErrorState(message: message, onRetry: onRetry)),
+      ViewError<T>(:final message) => Center(
+        child: ErrorState(message: message, onRetry: onRetry),
+      ),
       ViewData<T>(:final data) => builder(context, data),
     };
   }

@@ -14,7 +14,7 @@ import '../models/crop_cycle.dart';
 
 class CycleListController extends LoadableController<List<CropCycle>> {
   CycleListController(this._repository, DataChanges changes)
-      : super(changes, watch: {DbTable.cycles, DbTable.plots}) {
+    : super(changes, watch: {DbTable.cycles, DbTable.plots}) {
     load();
   }
 
@@ -60,7 +60,9 @@ class CycleDetailController extends LoadableController<CropCycle?> {
     this._repository,
     this._historyRepository,
     DataChanges changes,
-  ) : super(changes, watch: {
+  ) : super(
+        changes,
+        watch: {
           DbTable.cycles,
           DbTable.plots,
           DbTable.applications,
@@ -69,7 +71,8 @@ class CycleDetailController extends LoadableController<CropCycle?> {
           DbTable.expenses,
           DbTable.sales,
           DbTable.stageEvents,
-        }) {
+        },
+      ) {
     load();
   }
 
@@ -116,7 +119,6 @@ class CycleDetailController extends LoadableController<CropCycle?> {
   }
 }
 
-
 class CycleFormController extends FormController {
   CycleFormController(
     this._repository,
@@ -127,7 +129,9 @@ class CycleFormController extends FormController {
     cropController = text(initialCycle?.crop ?? '');
     varietyController = text(initialCycle?.variety ?? '');
     densityValueController = text(
-      initialCycle?.densityValue != null ? Formatters.editable(initialCycle!.densityValue) : '',
+      initialCycle?.densityValue != null
+          ? Formatters.editable(initialCycle!.densityValue)
+          : '',
     );
     densityNotesController = text(initialCycle?.densityNotes ?? '');
 
@@ -172,7 +176,8 @@ class CycleFormController extends FormController {
 
   void setPlantingDate(DateTime date) => update(() => plantingDate = date);
 
-  void setDensityUnit(DensityUnit unit) => update(() => selectedDensityUnit = unit);
+  void setDensityUnit(DensityUnit unit) =>
+      update(() => selectedDensityUnit = unit);
 
   void setStage(CropStage stage) => update(() => selectedStage = stage);
 
@@ -189,11 +194,15 @@ class CycleFormController extends FormController {
       id: initialCycle?.id,
       plotId: selectedPlotId!,
       crop: cropController.text.trim(),
-      variety: varietyController.text.trim().isEmpty ? null : varietyController.text.trim(),
+      variety: varietyController.text.trim().isEmpty
+          ? null
+          : varietyController.text.trim(),
       plantingDate: plantingDate,
       densityValue: densityVal,
       densityUnit: densityVal != null ? selectedDensityUnit : null,
-      densityNotes: densityNotesController.text.trim().isEmpty ? null : densityNotesController.text.trim(),
+      densityNotes: densityNotesController.text.trim().isEmpty
+          ? null
+          : densityNotesController.text.trim(),
       stage: selectedStage,
       createdAt: initialCycle?.createdAt ?? now,
       updatedAt: now,
@@ -215,7 +224,8 @@ class CloseCycleFormController extends FormController {
     whatWorkedController = text('');
     whatFailedController = text('');
 
-    harvestStart = cycle.harvestStart ?? DateTime.now().subtract(const Duration(days: 3));
+    harvestStart =
+        cycle.harvestStart ?? DateTime.now().subtract(const Duration(days: 3));
     harvestEnd = cycle.harvestEnd ?? DateTime.now();
     selectedYieldUnit = cycle.yieldUnit ?? YieldUnit.quintales;
     selectedQuality = cycle.quality ?? CropQuality.primera;
@@ -241,7 +251,8 @@ class CloseCycleFormController extends FormController {
 
   void setYieldUnit(YieldUnit unit) => update(() => selectedYieldUnit = unit);
 
-  void setQuality(CropQuality quality) => update(() => selectedQuality = quality);
+  void setQuality(CropQuality quality) =>
+      update(() => selectedQuality = quality);
 
   @override
   Future<SaveResult> performSave() async {
@@ -254,8 +265,12 @@ class CloseCycleFormController extends FormController {
       yieldValue: yieldVal,
       yieldUnit: selectedYieldUnit,
       quality: selectedQuality,
-      whatWorked: whatWorkedController.text.trim().isEmpty ? null : whatWorkedController.text.trim(),
-      whatFailed: whatFailedController.text.trim().isEmpty ? null : whatFailedController.text.trim(),
+      whatWorked: whatWorkedController.text.trim().isEmpty
+          ? null
+          : whatWorkedController.text.trim(),
+      whatFailed: whatFailedController.text.trim().isEmpty
+          ? null
+          : whatFailedController.text.trim(),
     );
 
     return const SaveSuccess(message: 'Cosecha registrada y ciclo finalizado');

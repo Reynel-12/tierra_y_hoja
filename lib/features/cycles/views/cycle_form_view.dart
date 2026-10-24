@@ -14,11 +14,7 @@ import '../models/crop_cycle.dart';
 
 /// Plantilla C: Formulario de Apertura / Edición de Siembra.
 class CycleFormView extends StatelessWidget {
-  const CycleFormView({
-    super.key,
-    this.cycleToEdit,
-    this.initialPlotId,
-  });
+  const CycleFormView({super.key, this.cycleToEdit, this.initialPlotId});
 
   final CropCycle? cycleToEdit;
   final int? initialPlotId;
@@ -59,7 +55,8 @@ class _CycleFormContent extends StatelessWidget {
           children: [
             if (controller.availablePlots.isEmpty)
               const FieldError(
-                message: 'No hay parcelas creadas. Primero registre un lote en la sección de Parcelas.',
+                message:
+                    'No hay parcelas creadas. Primero registre un lote en la sección de Parcelas.',
               )
             else
               _PlotPickerField(
@@ -72,13 +69,16 @@ class _CycleFormContent extends StatelessWidget {
               controller: controller.cropController,
               required: true,
               hint: 'ej. Maíz, Frijol, Tomate, Chile jalapeño, Café',
-              validator: Validators.required('Falta el nombre del cultivo. Escríbalo para comenzar.'),
+              validator: Validators.required(
+                'Falta el nombre del cultivo. Escríbalo para comenzar.',
+              ),
             ),
             AppTextField(
               label: 'Variedad o híbrido (opcional)',
               controller: controller.varietyController,
               hint: 'ej. Pólder, Rojo seda, HB-104, Catuaí',
-              helper: 'Especificar la variedad ayuda a comparar qué semilla rinde mejor.',
+              helper:
+                  'Especificar la variedad ayuda a comparar qué semilla rinde mejor.',
             ),
           ],
         ),
@@ -95,14 +95,17 @@ class _CycleFormContent extends StatelessWidget {
             ),
             AppChoiceChips<CropStage>(
               label: 'Estado inicial del ciclo',
-              options: CropStage.values.where((s) => s != CropStage.done).toList(),
+              options: CropStage.values
+                  .where((s) => s != CropStage.done)
+                  .toList(),
               value: controller.selectedStage,
               onChanged: (stage) {
                 if (stage != null) controller.setStage(stage);
               },
               allowDeselect: false,
               required: true,
-              helper: 'Seleccione la etapa en la que se encuentra actualmente el cultivo.',
+              helper:
+                  'Seleccione la etapa en la que se encuentra actualmente el cultivo.',
             ),
           ],
         ),
@@ -110,7 +113,8 @@ class _CycleFormContent extends StatelessWidget {
         // Densidad y detalles
         MoreDetails(
           label: 'Agregar densidad o cantidad sembrada',
-          initiallyExpanded: controller.densityValueController.text.isNotEmpty ||
+          initiallyExpanded:
+              controller.densityValueController.text.isNotEmpty ||
               controller.densityNotesController.text.isNotEmpty,
           children: [
             UnitField<DensityUnit>(
@@ -125,7 +129,8 @@ class _CycleFormContent extends StatelessWidget {
             AppTextField.notes(
               label: 'Notas de distanciamiento o siembra',
               controller: controller.densityNotesController,
-              hint: 'ej. 0.80 m entre surcos, 0.20 m entre plantas, 2 semillas por postura...',
+              hint:
+                  'ej. 0.80 m entre surcos, 0.20 m entre plantas, 2 semillas por postura...',
             ),
           ],
         ),
@@ -176,13 +181,11 @@ class _PlotPickerField extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione un lote para la siembra' : null,
-          decoration: const InputDecoration(
-            hintText: 'Seleccione el lote...',
-          ),
+          validator: (val) =>
+              val == null ? 'Seleccione un lote para la siembra' : null,
+          decoration: const InputDecoration(hintText: 'Seleccione el lote...'),
         ),
       ],
     );
   }
 }
-

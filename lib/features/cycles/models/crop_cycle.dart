@@ -23,12 +23,12 @@ enum CropStage implements ChoiceOption {
   final IconData icon;
 
   Color color(AppColors c) => switch (this) {
-        CropStage.prep => c.stagePrep,
-        CropStage.growth => c.stageGrowth,
-        CropStage.flower => c.stageFlower,
-        CropStage.harvest => c.stageHarvest,
-        CropStage.done => c.stageDone,
-      };
+    CropStage.prep => c.stagePrep,
+    CropStage.growth => c.stageGrowth,
+    CropStage.flower => c.stageFlower,
+    CropStage.harvest => c.stageHarvest,
+    CropStage.done => c.stageDone,
+  };
 }
 
 /// Unidades de densidad de siembra.
@@ -163,9 +163,8 @@ class CropCycle {
   bool get isClosed => stage == CropStage.done;
 
   /// Título compuesto: "Tomate pólder" o simplemente "Tomate".
-  String get title => (variety == null || variety!.trim().isEmpty)
-      ? crop
-      : '$crop $variety';
+  String get title =>
+      (variety == null || variety!.trim().isEmpty) ? crop : '$crop $variety';
 
   /// Días transcurridos desde la siembra hasta hoy o hasta la cosecha.
   int get daysSincePlanting {
@@ -175,12 +174,12 @@ class CropCycle {
 
   /// Progreso estimado (0 a 1) para la barra de 4 px (§7.6).
   double get estimatedProgress => switch (stage) {
-        CropStage.prep => 0.10,
-        CropStage.growth => 0.40,
-        CropStage.flower => 0.70,
-        CropStage.harvest => 0.90,
-        CropStage.done => 1.0,
-      };
+    CropStage.prep => 0.10,
+    CropStage.growth => 0.40,
+    CropStage.flower => 0.70,
+    CropStage.harvest => 0.90,
+    CropStage.done => 1.0,
+  };
 
   String get densityDisplay {
     if (densityValue == null) return densityNotes ?? '';

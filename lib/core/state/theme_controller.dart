@@ -39,11 +39,10 @@ class ThemeController extends ChangeNotifier {
         ThemeMode.dark => 'dark',
         ThemeMode.system => 'system',
       };
-      await _database.db.insert(
-        'app_settings',
-        {'key': 'theme_mode', 'value': val},
-        conflictAlgorithm: null,
-      );
+      await _database.db.insert('app_settings', {
+        'key': 'theme_mode',
+        'value': val,
+      }, conflictAlgorithm: null);
     } catch (_) {
       try {
         final val = switch (mode) {

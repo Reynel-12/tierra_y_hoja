@@ -28,9 +28,7 @@ class MoreView extends StatelessWidget {
     final themeController = context.watch<ThemeController>();
 
     return Scaffold(
-      appBar: const AppTopBar(
-        title: 'Más opciones',
-      ),
+      appBar: const AppTopBar(title: 'Más opciones'),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(pad, AppSpace.sm, pad, AppSpace.x4),
         child: ContentWidth(
@@ -51,7 +49,8 @@ class MoreView extends StatelessWidget {
                     ListRow(
                       icon: AppIcons.money,
                       title: 'Costos y Finanzas Globales',
-                      subtitle: 'Balance consolidado de insumos, jornales y ventas',
+                      subtitle:
+                          'Balance consolidado de insumos, jornales y ventas',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const CostSummaryView(),
@@ -62,7 +61,8 @@ class MoreView extends StatelessWidget {
                     ListRow(
                       icon: AppIcons.search,
                       title: 'Memoria y Experiencias Previas',
-                      subtitle: 'Consulte insumos usados antes, dosis y resultados',
+                      subtitle:
+                          'Consulte insumos usados antes, dosis y resultados',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const ExperienceSearchView(),
@@ -73,7 +73,8 @@ class MoreView extends StatelessWidget {
                     ListRow(
                       icon: AppIcons.scales,
                       title: 'Comparador de Siembras',
-                      subtitle: 'Compare rendimientos y costos de 2 ciclos lado a lado',
+                      subtitle:
+                          'Compare rendimientos y costos de 2 ciclos lado a lado',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const CycleComparisonView(),
@@ -93,7 +94,8 @@ class MoreView extends StatelessWidget {
                     ListRow(
                       icon: AppIcons.book,
                       title: 'Tour Guiado de la Aplicación',
-                      subtitle: 'Repase el orden correcto de registro y el uso de cada pantalla',
+                      subtitle:
+                          'Repase el orden correcto de registro y el uso de cada pantalla',
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const GuidedTourView(isRevisit: true),
@@ -123,20 +125,31 @@ class MoreView extends StatelessWidget {
                       children: [
                         ChoiceChip(
                           label: const Text('Sistema'),
-                          selected: themeController.themeMode == ThemeMode.system,
-                          onSelected: (_) => themeController.setThemeMode(ThemeMode.system),
+                          selected:
+                              themeController.themeMode == ThemeMode.system,
+                          onSelected: (_) =>
+                              themeController.setThemeMode(ThemeMode.system),
                         ),
                         ChoiceChip(
-                          avatar: const Icon(AppIcons.sun, size: AppSize.iconSm),
+                          avatar: const Icon(
+                            AppIcons.sun,
+                            size: AppSize.iconSm,
+                          ),
                           label: const Text('Claro (Sol)'),
-                          selected: themeController.themeMode == ThemeMode.light,
-                          onSelected: (_) => themeController.setThemeMode(ThemeMode.light),
+                          selected:
+                              themeController.themeMode == ThemeMode.light,
+                          onSelected: (_) =>
+                              themeController.setThemeMode(ThemeMode.light),
                         ),
                         ChoiceChip(
-                          avatar: const Icon(AppIcons.moon, size: AppSize.iconSm),
+                          avatar: const Icon(
+                            AppIcons.moon,
+                            size: AppSize.iconSm,
+                          ),
                           label: const Text('Oscuro (Noche)'),
                           selected: themeController.themeMode == ThemeMode.dark,
-                          onSelected: (_) => themeController.setThemeMode(ThemeMode.dark),
+                          onSelected: (_) =>
+                              themeController.setThemeMode(ThemeMode.dark),
                         ),
                       ],
                     ),
@@ -160,7 +173,10 @@ class MoreView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Tierra & Hoja', style: t.titleSm),
-                              Text('Versión 1.1.0 · Cuaderno de Campo', style: t.caption),
+                              Text(
+                                'Versión 1.1.0 · Cuaderno de Campo',
+                                style: t.caption,
+                              ),
                             ],
                           ),
                         ),
@@ -174,7 +190,11 @@ class MoreView extends StatelessWidget {
                     const SizedBox(height: AppSpace.md),
                     Row(
                       children: [
-                        Icon(AppIcons.checkCircle, size: AppSize.iconSm, color: c.positive),
+                        Icon(
+                          AppIcons.checkCircle,
+                          size: AppSize.iconSm,
+                          color: c.positive,
+                        ),
                         const SizedBox(width: AppSpace.xs),
                         Text('Base de datos SQLite local', style: t.label),
                       ],
@@ -182,7 +202,11 @@ class MoreView extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(AppIcons.checkCircle, size: AppSize.iconSm, color: c.positive),
+                        Icon(
+                          AppIcons.checkCircle,
+                          size: AppSize.iconSm,
+                          color: c.positive,
+                        ),
                         const SizedBox(width: AppSpace.xs),
                         Text('Fotos respaldadas en la galería', style: t.label),
                       ],

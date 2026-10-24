@@ -56,7 +56,8 @@ class _CycleComparisonContent extends StatelessWidget {
         body: EmptyState(
           icon: AppIcons.scales,
           title: 'Se necesitan al menos 2 siembras',
-          message: 'Registre al menos dos ciclos para comparar rendimientos, costos y resultados lado a lado.',
+          message:
+              'Registre al menos dos ciclos para comparar rendimientos, costos y resultados lado a lado.',
         ),
       );
     }
@@ -64,9 +65,7 @@ class _CycleComparisonContent extends StatelessWidget {
     final m = controller.metrics;
 
     return Scaffold(
-      appBar: const AppTopBar(
-        title: 'Comparar siembras',
-      ),
+      appBar: const AppTopBar(title: 'Comparar siembras'),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(pad, AppSpace.sm, pad, AppSpace.x4),
         child: ContentWidth(
@@ -87,21 +86,29 @@ class _CycleComparisonContent extends StatelessWidget {
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             key: ValueKey(controller.cycleA?.id),
-                            initialValue: controller.availableCycles.any((e) => e.id == controller.cycleA?.id)
+                            initialValue:
+                                controller.availableCycles.any(
+                                  (e) => e.id == controller.cycleA?.id,
+                                )
                                 ? controller.cycleA?.id
                                 : null,
                             isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'Siembra A'),
+                            decoration: const InputDecoration(
+                              labelText: 'Siembra A',
+                            ),
                             items: [
                               for (final cycle in controller.availableCycles)
                                 DropdownMenuItem(
                                   value: cycle.id,
-                                  child: Text('${cycle.title} (${cycle.plotName})'),
+                                  child: Text(
+                                    '${cycle.title} (${cycle.plotName})',
+                                  ),
                                 ),
                             ],
                             onChanged: (id) {
                               if (id == null) return;
-                              final match = controller.availableCycles.firstWhere((e) => e.id == id);
+                              final match = controller.availableCycles
+                                  .firstWhere((e) => e.id == id);
                               controller.selectCycleA(match);
                             },
                           ),
@@ -116,21 +123,29 @@ class _CycleComparisonContent extends StatelessWidget {
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             key: ValueKey(controller.cycleB?.id),
-                            initialValue: controller.availableCycles.any((e) => e.id == controller.cycleB?.id)
+                            initialValue:
+                                controller.availableCycles.any(
+                                  (e) => e.id == controller.cycleB?.id,
+                                )
                                 ? controller.cycleB?.id
                                 : null,
                             isExpanded: true,
-                            decoration: const InputDecoration(labelText: 'Siembra B'),
+                            decoration: const InputDecoration(
+                              labelText: 'Siembra B',
+                            ),
                             items: [
                               for (final cycle in controller.availableCycles)
                                 DropdownMenuItem(
                                   value: cycle.id,
-                                  child: Text('${cycle.title} (${cycle.plotName})'),
+                                  child: Text(
+                                    '${cycle.title} (${cycle.plotName})',
+                                  ),
                                 ),
                             ],
                             onChanged: (id) {
                               if (id == null) return;
-                              final match = controller.availableCycles.firstWhere((e) => e.id == id);
+                              final match = controller.availableCycles
+                                  .firstWhere((e) => e.id == id);
                               controller.selectCycleB(match);
                             },
                           ),
@@ -210,7 +225,10 @@ class _CycleComparisonContent extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Siembra A', style: t.label.copyWith(color: c.primary)),
+                            Text(
+                              'Siembra A',
+                              style: t.label.copyWith(color: c.primary),
+                            ),
                             const SizedBox(height: AppSpace.xs),
                             Text(m.cycleA.title, style: t.titleSm),
                             const SizedBox(height: AppSpace.sm),
@@ -233,7 +251,10 @@ class _CycleComparisonContent extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Siembra B', style: t.label.copyWith(color: c.accent)),
+                            Text(
+                              'Siembra B',
+                              style: t.label.copyWith(color: c.accent),
+                            ),
                             const SizedBox(height: AppSpace.xs),
                             Text(m.cycleB.title, style: t.titleSm),
                             const SizedBox(height: AppSpace.sm),

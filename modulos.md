@@ -54,7 +54,9 @@ Historial y bitácora unificada accesible directamente dentro de la ficha de det
 
 - Filtros rápidos por categoría dentro de la misma pantalla (Todos, Insumos, Labores, Plagas/Clima) para consultar ágilmente lo realizado en el lote.
 
-- Tarjetas detalladas de cada evento con fecha, dosis aplicada, personal involucrado, notas de campo, registro fotográfico (antes/después) y botón directo para evaluar la reacción post-aplicación.
+- Tarjetas optimizadas de cada evento con chips compactos (método de aplicación, clima, momento del día, severidad y veredicto), notas de campo, evidencia fotográfica y enlace interactivo a la ficha completa.
+
+- Ficha y modal de detalle exhaustivo (EventDetailSheet): Al tocar cualquier tarjeta se abre un diálogo/bottom sheet con toda la información técnica registrada sin sobrecargar el espacio visual (método de aplicación, dosis y dilución, clima observado, momento del día, notas iniciales, veredicto con badge semántico, síntomas manifestados, descripción detallada de la respuesta, fecha de evaluación o alerta de recordatorio pendiente con acceso a registrar la revisión, fotos comparativas antes/después a pantalla completa y botón de navegación directa).
 
 - Acceso directo a la línea de tiempo cronológica completa y exportación de la bitácora en formato PDF para compartir con técnicos o cooperativas.
 
@@ -118,11 +120,11 @@ Línea de Tiempo del Cultivo:
 
 Vista cronológica completa de la siembra: desde el día 0 hasta la cosecha, viendo en una sola pantalla todas las aplicaciones, fotos y reacciones.
 
-Filtros de Búsqueda de Experiencias:
+Filtros de Búsqueda de Experiencias y Memoria Unificada:
 
-Buscar por insumo: "¿Qué pasó la última vez que apliqué Calcio en suelo arcilloso?"
+- Filtro "Todos los eventos" y categorías específicas (Insumos, Labores, Plagas, Cosechas) con paginación optimizada (límite y desplazamiento SQL) y botón "Cargar más datos".
 
-Buscar por cultivo: "Ver todas las siembras de Tomate en el Lote 2 y comparar rendimientos".
+- Consulta completa de eventos en Memoria: Al tocar cualquier resultado se abre la ficha completa (EventDetailSheet) con todos los parámetros técnicos (dosis, método, clima, síntomas, notas, reacción, fotos y opción para ir al ciclo correspondiente).
 
 Comparador de Siembras:
 

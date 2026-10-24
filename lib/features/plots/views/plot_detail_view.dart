@@ -44,11 +44,15 @@ class PlotDetailView extends StatelessWidget {
 class _PlotDetailContent extends StatelessWidget {
   const _PlotDetailContent();
 
-  Future<void> _deletePlot(BuildContext context, PlotDetailController controller) async {
+  Future<void> _deletePlot(
+    BuildContext context,
+    PlotDetailController controller,
+  ) async {
     final confirmed = await showConfirmDialog(
       context,
       title: '¿Eliminar este lote?',
-      message: 'Se eliminarán también todos los ciclos y registros vinculados a esta tierra.',
+      message:
+          'Se eliminarán también todos los ciclos y registros vinculados a esta tierra.',
       confirmLabel: 'Eliminar lote',
       destructive: true,
     );
@@ -124,7 +128,8 @@ class _PlotDetailContent extends StatelessWidget {
                 children: [
                   if (plot.photoPath != null) ...[
                     GestureDetector(
-                      onTap: () => PhotoViewerPage.open(context, before: plot.photoPath),
+                      onTap: () =>
+                          PhotoViewerPage.open(context, before: plot.photoPath),
                       child: ClipRRect(
                         borderRadius: AppRadius.card,
                         child: PhotoBanner(
@@ -198,11 +203,13 @@ class _PlotDetailContent extends StatelessWidget {
                           const Divider(),
                           InfoLine(
                             label: 'Coordenadas GPS',
-                            value: '${plot.latitude!.toStringAsFixed(5)}, ${plot.longitude!.toStringAsFixed(5)}',
+                            value:
+                                '${plot.latitude!.toStringAsFixed(5)}, ${plot.longitude!.toStringAsFixed(5)}',
                             icon: AppIcons.location,
                           ),
                         ],
-                        if (plot.previousCrops != null && plot.previousCrops!.isNotEmpty) ...[
+                        if (plot.previousCrops != null &&
+                            plot.previousCrops!.isNotEmpty) ...[
                           const Divider(),
                           InfoLine(
                             label: 'Historial previo (rotación)',
@@ -232,10 +239,14 @@ class _PlotDetailContent extends StatelessWidget {
                         FilledButton.icon(
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => CycleFormView(initialPlotId: plot.id),
+                              builder: (_) =>
+                                  CycleFormView(initialPlotId: plot.id),
                             ),
                           ),
-                          icon: const Icon(AppIcons.cycle, size: AppSize.iconSm),
+                          icon: const Icon(
+                            AppIcons.cycle,
+                            size: AppSize.iconSm,
+                          ),
                           label: const Text('Abrir siembra en este lote'),
                         ),
                       ],

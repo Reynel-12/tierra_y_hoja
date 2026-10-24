@@ -28,15 +28,14 @@ class CircleIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final bg = background ?? (color != null ? color!.withValues(alpha: 0.15) : c.primarySoft);
+    final bg =
+        background ??
+        (color != null ? color!.withValues(alpha: 0.15) : c.primarySoft);
     final fg = foreground ?? color ?? c.onPrimarySoft;
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        color: bg,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
       alignment: Alignment.center,
       child: Icon(
         icon,

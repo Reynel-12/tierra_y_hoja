@@ -68,7 +68,11 @@ class Expense {
     return Expense(
       id: row.integerOrNull('id'),
       cycleId: row.integer('cycle_id'),
-      category: enumFromName(ExpenseCategory.values, row['category'], ExpenseCategory.insumos),
+      category: enumFromName(
+        ExpenseCategory.values,
+        row['category'],
+        ExpenseCategory.insumos,
+      ),
       description: row.textOrNull('description'),
       quantity: row.decimalOrNull('quantity'),
       unitPrice: row.decimalOrNull('unit_price'),

@@ -50,9 +50,13 @@ class _ApplicationFormContent extends StatelessWidget {
     final controller = context.watch<ApplicationFormController>();
 
     return FormScaffold(
-      title: controller.isEditing ? 'Editar aplicación' : 'Nueva aplicación de insumo',
+      title: controller.isEditing
+          ? 'Editar aplicación'
+          : 'Nueva aplicación de insumo',
       subtitle: 'Registre fertilizantes, foliares, insecticidas y enmiendas',
-      saveLabel: controller.isEditing ? 'Guardar cambios' : 'Guardar aplicación',
+      saveLabel: controller.isEditing
+          ? 'Guardar cambios'
+          : 'Guardar aplicación',
       isDirty: controller.isDirty,
       isSaving: controller.isSaving,
       isReady: controller.isReady,
@@ -67,7 +71,8 @@ class _ApplicationFormContent extends StatelessWidget {
           children: [
             if (controller.availableCycles.isEmpty)
               const FieldError(
-                message: 'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
+                message:
+                    'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
               )
             else
               _CyclePickerField(
@@ -79,7 +84,9 @@ class _ApplicationFormContent extends StatelessWidget {
               label: 'Tipo de insumo',
               options: InputType.values,
               value: controller.selectedInputType,
-              onChanged: (type) => controller.setInputType(type ?? InputType.fertilizanteGranular),
+              onChanged: (type) => controller.setInputType(
+                type ?? InputType.fertilizanteGranular,
+              ),
               allowDeselect: false,
               required: true,
             ),
@@ -88,7 +95,9 @@ class _ApplicationFormContent extends StatelessWidget {
               controller: controller.productNameController,
               required: true,
               hint: 'ej. Urea 46%, Nitrato de calcio, Foligán, Cipermetrina',
-              validator: Validators.required('Falta el nombre del insumo o producto aplicado.'),
+              validator: Validators.required(
+                'Falta el nombre del insumo o producto aplicado.',
+              ),
             ),
           ],
         ),
@@ -120,7 +129,8 @@ class _ApplicationFormContent extends StatelessWidget {
                 if (time != null) controller.setTimeOfDay(time);
               },
               allowDeselect: false,
-              helper: 'Importante: aplicar con sol fuerte puede causar quemaduras en la hoja.',
+              helper:
+                  'Importante: aplicar con sol fuerte puede causar quemaduras en la hoja.',
             ),
           ],
         ),
@@ -145,7 +155,8 @@ class _ApplicationFormContent extends StatelessWidget {
               label: 'Foto de la planta "antes" de aplicar (opcional)',
               path: controller.photoBefore,
               onChanged: controller.setPhotoBefore,
-              helper: 'Servirá para comparar el antes y después en el seguimiento.',
+              helper:
+                  'Servirá para comparar el antes y después en el seguimiento.',
             ),
           ],
         ),
@@ -153,13 +164,15 @@ class _ApplicationFormContent extends StatelessWidget {
         // Detalles adicionales expandibles
         MoreDetails(
           label: 'Agregar método, clima y notas',
-          initiallyExpanded: controller.methodController.text.isNotEmpty ||
+          initiallyExpanded:
+              controller.methodController.text.isNotEmpty ||
               controller.notesController.text.isNotEmpty,
           children: [
             AppTextField(
               label: 'Método de aplicación',
               controller: controller.methodController,
-              hint: 'ej. Al pie de la planta, bomba de mochila al follaje, fertirriego',
+              hint:
+                  'ej. Al pie de la planta, bomba de mochila al follaje, fertirriego',
             ),
             AppChoiceChips<WeatherCondition>(
               label: 'Condición climática',
@@ -212,7 +225,8 @@ class _CyclePickerField extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione la siembra correspondiente' : null,
+          validator: (val) =>
+              val == null ? 'Seleccione la siembra correspondiente' : null,
           decoration: const InputDecoration(
             hintText: 'Seleccione la siembra...',
           ),

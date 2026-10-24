@@ -26,7 +26,9 @@ class TaskFormController extends FormController {
           : '',
     );
     irrigationMmController = text(
-      initialTask?.irrigationMm != null ? Formatters.editable(initialTask!.irrigationMm) : '',
+      initialTask?.irrigationMm != null
+          ? Formatters.editable(initialTask!.irrigationMm)
+          : '',
     );
     workersController = text(
       initialTask?.workers != null ? initialTask!.workers.toString() : '',
@@ -98,12 +100,16 @@ class TaskFormController extends FormController {
       id: initialTask?.id,
       cycleId: selectedCycleId!,
       taskType: selectedTaskType,
-      method: methodController.text.trim().isEmpty ? null : methodController.text.trim(),
+      method: methodController.text.trim().isEmpty
+          ? null
+          : methodController.text.trim(),
       date: date,
       irrigationHours: Formatters.parseNumber(irrigationHoursController.text),
       irrigationMm: Formatters.parseNumber(irrigationMmController.text),
       workers: int.tryParse(workersController.text.trim()),
-      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
       photoPath: photoPath,
       createdAt: initialTask?.createdAt ?? now,
     );
@@ -115,7 +121,9 @@ class TaskFormController extends FormController {
     }
     await _photoTracker.commit();
 
-    return SaveSuccess(message: isEditing ? 'Labor actualizada' : 'Labor registrada');
+    return SaveSuccess(
+      message: isEditing ? 'Labor actualizada' : 'Labor registrada',
+    );
   }
 
   Future<bool> delete() async {
@@ -200,7 +208,8 @@ class IncidentFormController extends FormController {
 
   void setKind(IncidentKind kind) => update(() => selectedKind = kind);
 
-  void setSeverity(IncidentSeverity severity) => update(() => selectedSeverity = severity);
+  void setSeverity(IncidentSeverity severity) =>
+      update(() => selectedSeverity = severity);
 
   void setDate(DateTime d) => update(() => date = d);
 
@@ -223,8 +232,12 @@ class IncidentFormController extends FormController {
       name: nameController.text.trim(),
       severity: selectedSeverity,
       date: date,
-      actionTaken: actionTakenController.text.trim().isEmpty ? null : actionTakenController.text.trim(),
-      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      actionTaken: actionTakenController.text.trim().isEmpty
+          ? null
+          : actionTakenController.text.trim(),
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
       photoPath: photoPath,
       createdAt: initialIncident?.createdAt ?? now,
     );
@@ -236,7 +249,9 @@ class IncidentFormController extends FormController {
     }
     await _photoTracker.commit();
 
-    return SaveSuccess(message: isEditing ? 'Incidencia actualizada' : 'Incidencia registrada');
+    return SaveSuccess(
+      message: isEditing ? 'Incidencia actualizada' : 'Incidencia registrada',
+    );
   }
 
   Future<bool> delete() async {

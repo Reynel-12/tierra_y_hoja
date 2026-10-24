@@ -9,14 +9,17 @@ class ActivityRepository {
 
   // Labores culturales
   Future<List<CulturalTask>> getTasksByCycle(int cycleId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT t.*, c.crop as crop_title, p.name as plot_name
       FROM cultural_tasks t
       INNER JOIN crop_cycles c ON c.id = t.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE t.cycle_id = ?
       ORDER BY t.date DESC
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     return results.map(CulturalTask.fromRow).toList();
   }
@@ -39,20 +42,27 @@ class ActivityRepository {
   }
 
   Future<void> deleteTask(int id) async {
-    await _database.db.delete('cultural_tasks', where: 'id = ?', whereArgs: [id]);
+    await _database.db.delete(
+      'cultural_tasks',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     _database.changes.notify({DbTable.tasks});
   }
 
   // Incidencias y eventos climáticos
   Future<List<Incident>> getIncidentsByCycle(int cycleId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT i.*, c.crop as crop_title, p.name as plot_name
       FROM incidents i
       INNER JOIN crop_cycles c ON c.id = i.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE i.cycle_id = ?
       ORDER BY i.date DESC
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     return results.map(Incident.fromRow).toList();
   }

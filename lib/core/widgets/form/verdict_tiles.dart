@@ -22,6 +22,12 @@ enum ReactionVerdict implements ChoiceOption {
 
   @override
   final IconData icon;
+
+  Color color(AppColors c) => switch (this) {
+    ReactionVerdict.positive => c.positive,
+    ReactionVerdict.neutral => c.neutral,
+    ReactionVerdict.negative => c.negative,
+  };
 }
 
 /// Tiles de veredicto (Positiva / Sin cambio / Negativa) — Diseño §7.5
@@ -89,7 +95,11 @@ class VerdictTiles extends StatelessWidget {
                     softColor: c.positiveSoft,
                     isSelected: value == ReactionVerdict.positive,
                     onTap: () {
-                      onChanged(value == ReactionVerdict.positive ? null : ReactionVerdict.positive);
+                      onChanged(
+                        value == ReactionVerdict.positive
+                            ? null
+                            : ReactionVerdict.positive,
+                      );
                       revalidate();
                     },
                   ),
@@ -104,7 +114,11 @@ class VerdictTiles extends StatelessWidget {
                     softColor: c.neutralSoft,
                     isSelected: value == ReactionVerdict.neutral,
                     onTap: () {
-                      onChanged(value == ReactionVerdict.neutral ? null : ReactionVerdict.neutral);
+                      onChanged(
+                        value == ReactionVerdict.neutral
+                            ? null
+                            : ReactionVerdict.neutral,
+                      );
                       revalidate();
                     },
                   ),
@@ -119,7 +133,11 @@ class VerdictTiles extends StatelessWidget {
                     softColor: c.negativeSoft,
                     isSelected: value == ReactionVerdict.negative,
                     onTap: () {
-                      onChanged(value == ReactionVerdict.negative ? null : ReactionVerdict.negative);
+                      onChanged(
+                        value == ReactionVerdict.negative
+                            ? null
+                            : ReactionVerdict.negative,
+                      );
                       revalidate();
                     },
                   ),
@@ -147,7 +165,9 @@ class VerdictTiles extends StatelessWidget {
                                 for (final symptom in defaultSymptoms)
                                   AppChip(
                                     label: symptom,
-                                    selected: selectedSymptoms.contains(symptom),
+                                    selected: selectedSymptoms.contains(
+                                      symptom,
+                                    ),
                                     onTap: () {
                                       final updated = {...selectedSymptoms};
                                       if (updated.contains(symptom)) {
@@ -165,7 +185,8 @@ class VerdictTiles extends StatelessWidget {
                             AppTextField.notes(
                               label: 'Detalle o notas de fitotoxicidad',
                               controller: symptomsController!,
-                              hint: 'Describa el daño o síntomas observados en la planta...',
+                              hint:
+                                  'Describa el daño o síntomas observados en la planta...',
                             ),
                           ],
                         ],
@@ -241,16 +262,14 @@ class _VerdictTile extends StatelessWidget {
                         color: color,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        AppIcons.check,
-                        size: 12,
-                        color: c.paper,
-                      ),
+                      child: Icon(AppIcons.check, size: 12, color: c.paper),
                     ),
                   ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpace.xs),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpace.xs,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -258,10 +277,7 @@ class _VerdictTile extends StatelessWidget {
                         const SizedBox(height: AppSpace.sm),
                         Text(
                           label,
-                          style: t.label.copyWith(
-                            color: c.ink,
-                            fontSize: 13,
-                          ),
+                          style: t.label.copyWith(color: c.ink, fontSize: 13),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

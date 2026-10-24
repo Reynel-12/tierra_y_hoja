@@ -161,7 +161,11 @@ class InputApplication {
     return InputApplication(
       id: row.integerOrNull('id'),
       cycleId: row.integer('cycle_id'),
-      inputType: enumFromName(InputType.values, row['input_type'], InputType.fertilizanteGranular),
+      inputType: enumFromName(
+        InputType.values,
+        row['input_type'],
+        InputType.fertilizanteGranular,
+      ),
       productName: row.text('product_name'),
       doseValue: row.decimalOrNull('dose_value'),
       doseUnit: enumFromNameOrNull(DoseUnit.values, row['dose_unit']),

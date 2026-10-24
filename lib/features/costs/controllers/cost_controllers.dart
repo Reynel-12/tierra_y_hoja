@@ -23,11 +23,8 @@ class CostSummaryData {
 }
 
 class CostSummaryController extends LoadableController<CostSummaryData> {
-  CostSummaryController(
-    this._repository,
-    DataChanges changes, {
-    this.cycleId,
-  }) : super(changes, watch: {DbTable.expenses, DbTable.sales}) {
+  CostSummaryController(this._repository, DataChanges changes, {this.cycleId})
+    : super(changes, watch: {DbTable.expenses, DbTable.sales}) {
     load();
   }
 
@@ -48,11 +45,7 @@ class CostSummaryController extends LoadableController<CostSummaryData> {
         ? await _repository.getSalesByCycle(cycleId!)
         : await _repository.getAllSales();
 
-    return CostSummaryData(
-      summary: summary,
-      expenses: expenses,
-      sales: sales,
-    );
+    return CostSummaryData(summary: summary, expenses: expenses, sales: sales);
   }
 
   Future<void> deleteExpense(int id) async {
@@ -73,10 +66,14 @@ class ExpenseFormController extends FormController {
   }) {
     descriptionController = text(initialExpense?.description ?? '');
     quantityController = text(
-      initialExpense?.quantity != null ? Formatters.editable(initialExpense!.quantity) : '',
+      initialExpense?.quantity != null
+          ? Formatters.editable(initialExpense!.quantity)
+          : '',
     );
     unitPriceController = text(
-      initialExpense?.unitPrice != null ? Formatters.editable(initialExpense!.unitPrice) : '',
+      initialExpense?.unitPrice != null
+          ? Formatters.editable(initialExpense!.unitPrice)
+          : '',
     );
     amountController = text(
       initialExpense != null ? Formatters.editable(initialExpense!.amount) : '',
@@ -126,7 +123,9 @@ class ExpenseFormController extends FormController {
       if (selectedCycleId == null && availableCycles.isNotEmpty) {
         // Priorizar el ciclo activo más reciente
         final active = availableCycles.where((c) => !c.isClosed).toList();
-        selectedCycleId = active.isNotEmpty ? active.first.id : availableCycles.first.id;
+        selectedCycleId = active.isNotEmpty
+            ? active.first.id
+            : availableCycles.first.id;
       }
     } catch (_) {
       availableCycles = [];
@@ -136,7 +135,8 @@ class ExpenseFormController extends FormController {
 
   void setCycle(int? cycleId) => update(() => selectedCycleId = cycleId);
 
-  void setCategory(ExpenseCategory category) => update(() => selectedCategory = category);
+  void setCategory(ExpenseCategory category) =>
+      update(() => selectedCategory = category);
 
   void setDate(DateTime newDate) => update(() => date = newDate);
 
@@ -150,7 +150,9 @@ class ExpenseFormController extends FormController {
   @override
   Future<SaveResult> performSave() async {
     if (selectedCycleId == null) {
-      return const SaveFailure('Debe seleccionar a qué siembra o lote pertenece este gasto.');
+      return const SaveFailure(
+        'Debe seleccionar a qué siembra o lote pertenece este gasto.',
+      );
     }
 
     final amount = Formatters.parseNumber(amountController.text);
@@ -163,12 +165,16 @@ class ExpenseFormController extends FormController {
       id: initialExpense?.id,
       cycleId: selectedCycleId!,
       category: selectedCategory,
-      description: descriptionController.text.trim().isEmpty ? null : descriptionController.text.trim(),
+      description: descriptionController.text.trim().isEmpty
+          ? null
+          : descriptionController.text.trim(),
       quantity: Formatters.parseNumber(quantityController.text),
       unitPrice: Formatters.parseNumber(unitPriceController.text),
       amount: amount,
       date: date,
-      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
       createdAt: initialExpense?.createdAt ?? now,
     );
 
@@ -190,11 +196,15 @@ class SaleFormController extends FormController {
     int? preselectedCycleId,
   }) {
     quantityController = text(
-      initialSale?.quantity != null ? Formatters.editable(initialSale!.quantity) : '',
+      initialSale?.quantity != null
+          ? Formatters.editable(initialSale!.quantity)
+          : '',
     );
     unitController = text(initialSale?.unit ?? 'Quintales');
     unitPriceController = text(
-      initialSale?.unitPrice != null ? Formatters.editable(initialSale!.unitPrice) : '',
+      initialSale?.unitPrice != null
+          ? Formatters.editable(initialSale!.unitPrice)
+          : '',
     );
     amountController = text(
       initialSale != null ? Formatters.editable(initialSale!.amount) : '',
@@ -242,7 +252,9 @@ class SaleFormController extends FormController {
       availableCycles = await _cycleRepository.getAll();
       if (selectedCycleId == null && availableCycles.isNotEmpty) {
         final active = availableCycles.where((c) => !c.isClosed).toList();
-        selectedCycleId = active.isNotEmpty ? active.first.id : availableCycles.first.id;
+        selectedCycleId = active.isNotEmpty
+            ? active.first.id
+            : availableCycles.first.id;
       }
     } catch (_) {
       availableCycles = [];
@@ -264,12 +276,16 @@ class SaleFormController extends FormController {
   @override
   Future<SaveResult> performSave() async {
     if (selectedCycleId == null) {
-      return const SaveFailure('Debe seleccionar a qué siembra o lote pertenece esta venta.');
+      return const SaveFailure(
+        'Debe seleccionar a qué siembra o lote pertenece esta venta.',
+      );
     }
 
     final amount = Formatters.parseNumber(amountController.text);
     if (amount == null || amount <= 0) {
-      return const SaveFailure('Debe ingresar un monto total de venta mayor a 0.');
+      return const SaveFailure(
+        'Debe ingresar un monto total de venta mayor a 0.',
+      );
     }
 
     final now = DateTime.now();
@@ -277,12 +293,18 @@ class SaleFormController extends FormController {
       id: initialSale?.id,
       cycleId: selectedCycleId!,
       quantity: Formatters.parseNumber(quantityController.text),
-      unit: unitController.text.trim().isEmpty ? null : unitController.text.trim(),
+      unit: unitController.text.trim().isEmpty
+          ? null
+          : unitController.text.trim(),
       unitPrice: Formatters.parseNumber(unitPriceController.text),
       amount: amount,
       date: date,
-      buyer: buyerController.text.trim().isEmpty ? null : buyerController.text.trim(),
-      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      buyer: buyerController.text.trim().isEmpty
+          ? null
+          : buyerController.text.trim(),
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
       createdAt: initialSale?.createdAt ?? now,
     );
 

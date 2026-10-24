@@ -3,10 +3,12 @@ import 'package:tierra_y_hoja/core/database/data_changes.dart';
 import 'package:tierra_y_hoja/core/design/app_colors.dart';
 import 'package:tierra_y_hoja/core/utils/formatters.dart';
 import 'package:tierra_y_hoja/core/utils/validators.dart';
+import 'package:tierra_y_hoja/core/widgets/form/verdict_tiles.dart';
 import 'package:tierra_y_hoja/features/costs/models/cost_models.dart';
 import 'package:tierra_y_hoja/features/cycles/controllers/cycle_controllers.dart';
 import 'package:tierra_y_hoja/features/cycles/data/cycle_repository.dart';
 import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
+import 'package:tierra_y_hoja/features/field_log/models/input_application.dart';
 import 'package:tierra_y_hoja/features/history/data/history_repository.dart';
 import 'package:tierra_y_hoja/features/history/models/experience_models.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
@@ -196,6 +198,63 @@ void main() {
         type: TimelineEventType.cosecha,
       );
       expect(itemCosecha.color(colors), colors.positive);
+    });
+
+    test('LearningResult.toTimelineItem preserves all detailed properties', () {
+      final now = DateTime.now();
+      final app = InputApplication(
+        id: 10,
+        cycleId: 5,
+        inputType: InputType.foliar,
+        productName: 'Calcio Boro 20L',
+        doseValue: 50,
+        doseUnit: DoseUnit.copasBomba,
+        method: 'Foliar mochila',
+        appliedAt: now,
+        timeOfDay: TimeOfDayChoice.morning,
+        weather: WeatherCondition.sunny,
+        verdict: ReactionVerdict.positive,
+        reactionNotes: 'Follaje verde vigoroso',
+        symptoms: 'Vigor renovado, sin quemaduras',
+        reviewedAt: now,
+        notes: 'Aplicado temprano con rocío ligero',
+        createdAt: now,
+        cropTitle: 'Tomate Santa Clara',
+        plotName: 'Lote El Roble',
+      );
+
+      final learning = LearningResult(
+        crop: 'Tomate Santa Clara',
+        plotName: 'Lote El Roble',
+        date: now,
+        title: 'Calcio Boro 20L (Foliar)',
+        category: 'Insumo / Tratamiento',
+        type: TimelineEventType.insumo,
+        id: 10,
+        cycleId: 5,
+        application: app,
+        verdict: 'Positiva',
+        notes: 'Aplicado temprano con rocío ligero',
+        method: 'Foliar mochila',
+        weather: WeatherCondition.sunny,
+        timeOfDay: TimeOfDayChoice.morning,
+        doseDisplay: '50 copas/bomba',
+        symptoms: 'Vigor renovado, sin quemaduras',
+        reactionNotes: 'Follaje verde vigoroso',
+      );
+
+      final timelineItem = learning.toTimelineItem();
+      expect(timelineItem.id, 10);
+      expect(timelineItem.cycleId, 5);
+      expect(timelineItem.type, TimelineEventType.insumo);
+      expect(timelineItem.title, 'Calcio Boro 20L (Foliar)');
+      expect(timelineItem.application, isNotNull);
+      expect(timelineItem.application?.method, 'Foliar mochila');
+      expect(timelineItem.application?.weather, WeatherCondition.sunny);
+      expect(timelineItem.application?.verdict, ReactionVerdict.positive);
+      expect(timelineItem.application?.reactionNotes, 'Follaje verde vigoroso');
+      expect(timelineItem.cropTitle, 'Tomate Santa Clara');
+      expect(timelineItem.plotName, 'Lote El Roble');
     });
   });
 

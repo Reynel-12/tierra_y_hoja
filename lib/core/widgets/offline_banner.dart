@@ -12,7 +12,8 @@ import '../utils/responsive.dart';
 class OfflineBanner extends StatelessWidget {
   const OfflineBanner({
     super.key,
-    this.message = '100% sin conexión · Sus registros se guardan en el teléfono',
+    this.message =
+        '100% sin conexión · Sus registros se guardan en el teléfono',
   });
 
   final String message;

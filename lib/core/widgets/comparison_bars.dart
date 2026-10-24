@@ -35,7 +35,8 @@ class ComparisonBars extends StatelessWidget {
     final maxValue = [a.abs(), b.abs(), 0.0001].reduce((x, y) => x > y ? x : y);
 
     return Semantics(
-      label: '$title. $labelA: ${valueA == null ? 'sin dato' : format(a)}. '
+      label:
+          '$title. $labelA: ${valueA == null ? 'sin dato' : format(a)}. '
           '$labelB: ${valueB == null ? 'sin dato' : format(b)}.',
       excludeSemantics: true,
       child: Column(
@@ -81,10 +82,7 @@ class _Bar extends StatelessWidget {
     final t = context.t;
     return Row(
       children: [
-        SizedBox(
-          width: 20,
-          child: Text(tag, style: t.label),
-        ),
+        SizedBox(width: 20, child: Text(tag, style: t.label)),
         Expanded(
           child: Container(
             height: 20,
@@ -109,11 +107,7 @@ class _Bar extends StatelessWidget {
         const SizedBox(width: AppSpace.sm),
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 72),
-          child: Text(
-            valueText,
-            style: t.label,
-            textAlign: TextAlign.right,
-          ),
+          child: Text(valueText, style: t.label, textAlign: TextAlign.right),
         ),
       ],
     );

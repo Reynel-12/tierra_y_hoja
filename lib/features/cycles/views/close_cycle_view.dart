@@ -19,10 +19,8 @@ class CloseCycleView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (ctx) => CloseCycleFormController(
-        cycle,
-        ctx.read<CycleRepository>(),
-      ),
+      create: (ctx) =>
+          CloseCycleFormController(cycle, ctx.read<CycleRepository>()),
       child: const _CloseCycleContent(),
     );
   }
@@ -69,7 +67,8 @@ class _CloseCycleContent extends StatelessWidget {
               },
               allowDeselect: false,
               required: true,
-              helper: 'Evalúe la apariencia y valor comercial del producto cosechado.',
+              helper:
+                  'Evalúe la apariencia y valor comercial del producto cosechado.',
             ),
           ],
         ),
@@ -100,14 +99,17 @@ class _CloseCycleContent extends StatelessWidget {
             AppTextField.notes(
               label: '¿Qué funcionó bien en este ciclo?',
               controller: controller.whatWorkedController,
-              hint: 'ej. La fertilización foliar a los 25 días dio excelente vigor, el riego por goteo ahorró agua...',
+              hint:
+                  'ej. La fertilización foliar a los 25 días dio excelente vigor, el riego por goteo ahorró agua...',
               helper: 'Servirá para repetir el éxito en futuras temporadas.',
             ),
             AppTextField.notes(
               label: '¿Qué falló o se debe mejorar?',
               controller: controller.whatFailedController,
-              hint: 'ej. Se descuidó el gusano cogollero la segunda semana, faltó aporco a tiempo...',
-              helper: 'Lecciones aprendidas para no cometer los mismos errores.',
+              hint:
+                  'ej. Se descuidó el gusano cogollero la segunda semana, faltó aporco a tiempo...',
+              helper:
+                  'Lecciones aprendidas para no cometer los mismos errores.',
             ),
           ],
         ),

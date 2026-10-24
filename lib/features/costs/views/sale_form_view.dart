@@ -14,11 +14,7 @@ import '../models/cost_models.dart';
 
 /// Plantilla C: Registro de Venta de Cosecha.
 class SaleFormView extends StatelessWidget {
-  const SaleFormView({
-    super.key,
-    this.saleToEdit,
-    this.initialCycleId,
-  });
+  const SaleFormView({super.key, this.saleToEdit, this.initialCycleId});
 
   final Sale? saleToEdit;
   final int? initialCycleId;
@@ -45,7 +41,9 @@ class _SaleFormContent extends StatelessWidget {
     final controller = context.watch<SaleFormController>();
 
     return FormScaffold(
-      title: controller.isEditing ? 'Editar venta' : 'Registrar venta de cosecha',
+      title: controller.isEditing
+          ? 'Editar venta'
+          : 'Registrar venta de cosecha',
       subtitle: 'Ingresos obtenidos por la comercialización de la producción',
       saveLabel: controller.isEditing ? 'Guardar cambios' : 'Guardar venta',
       isDirty: controller.isDirty,
@@ -67,7 +65,8 @@ class _SaleFormContent extends StatelessWidget {
           children: [
             if (controller.availableCycles.isEmpty)
               const FieldError(
-                message: 'No hay siembras registradas. Primero registre una siembra.',
+                message:
+                    'No hay siembras registradas. Primero registre una siembra.',
               )
             else
               _CyclePicker(
@@ -94,7 +93,9 @@ class _SaleFormContent extends StatelessWidget {
                   child: AppTextField(
                     label: 'Cantidad cosechada',
                     controller: controller.quantityController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     hint: 'ej. 50',
                     validator: Validators.optionalNumber,
                   ),
@@ -116,7 +117,9 @@ class _SaleFormContent extends StatelessWidget {
                   child: AppTextField(
                     label: 'Precio por unidad (L)',
                     controller: controller.unitPriceController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     prefixText: 'L ',
                     hint: 'ej. 850',
                     validator: Validators.optionalNumber,
@@ -127,11 +130,15 @@ class _SaleFormContent extends StatelessWidget {
                   child: AppTextField(
                     label: 'Total cobrado (L)',
                     controller: controller.amountController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     prefixText: 'L ',
                     required: true,
                     hint: '0.00',
-                    validator: Validators.requiredMoney('Ingrese el total de la venta.'),
+                    validator: Validators.requiredMoney(
+                      'Ingrese el total de la venta.',
+                    ),
                   ),
                 ),
               ],
@@ -195,7 +202,8 @@ class _CyclePicker extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione la siembra correspondiente' : null,
+          validator: (val) =>
+              val == null ? 'Seleccione la siembra correspondiente' : null,
           decoration: const InputDecoration(
             hintText: 'Seleccione la siembra...',
           ),

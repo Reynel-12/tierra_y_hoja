@@ -17,11 +17,7 @@ import '../models/activity_models.dart';
 
 /// Plantilla C: Formulario de Incidencia / Plaga / Evento Climático.
 class IncidentFormView extends StatelessWidget {
-  const IncidentFormView({
-    super.key,
-    this.incidentToEdit,
-    this.initialCycleId,
-  });
+  const IncidentFormView({super.key, this.incidentToEdit, this.initialCycleId});
 
   final Incident? incidentToEdit;
   final int? initialCycleId;
@@ -50,9 +46,13 @@ class _IncidentFormContent extends StatelessWidget {
     final c = context.c;
 
     return FormScaffold(
-      title: controller.isEditing ? 'Editar incidencia' : 'Nueva incidencia o plaga',
+      title: controller.isEditing
+          ? 'Editar incidencia'
+          : 'Nueva incidencia o plaga',
       subtitle: 'Registre plagas, enfermedades o eventos climáticos adversos',
-      saveLabel: controller.isEditing ? 'Guardar cambios' : 'Guardar incidencia',
+      saveLabel: controller.isEditing
+          ? 'Guardar cambios'
+          : 'Guardar incidencia',
       isDirty: controller.isDirty,
       isSaving: controller.isSaving,
       isReady: controller.isReady,
@@ -67,7 +67,8 @@ class _IncidentFormContent extends StatelessWidget {
           children: [
             if (controller.availableCycles.isEmpty)
               const FieldError(
-                message: 'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
+                message:
+                    'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
               )
             else
               _CyclePickerField(
@@ -84,7 +85,8 @@ class _IncidentFormContent extends StatelessWidget {
               },
               allowDeselect: false,
               required: true,
-              helper: 'Plagas (insectos), enfermedades (hongos) o clima (sequía, granizo).',
+              helper:
+                  'Plagas (insectos), enfermedades (hongos) o clima (sequía, granizo).',
             ),
             AppTextField(
               label: switch (controller.selectedKind) {
@@ -95,11 +97,16 @@ class _IncidentFormContent extends StatelessWidget {
               controller: controller.nameController,
               required: true,
               hint: switch (controller.selectedKind) {
-                IncidentKind.plaga => 'ej. Gusano cogollero, Mosca blanca, Pulgón, Babosa',
-                IncidentKind.enfermedad => 'ej. Roya, Tizón tardío, Mancha de asfalto, Antracnosis',
-                IncidentKind.clima => 'ej. Sequía prolongada, Exceso de lluvia, Granizada, Viento fuerte',
+                IncidentKind.plaga =>
+                  'ej. Gusano cogollero, Mosca blanca, Pulgón, Babosa',
+                IncidentKind.enfermedad =>
+                  'ej. Roya, Tizón tardío, Mancha de asfalto, Antracnosis',
+                IncidentKind.clima =>
+                  'ej. Sequía prolongada, Exceso de lluvia, Granizada, Viento fuerte',
               },
-              validator: Validators.required('Falta el nombre o descripción de la incidencia.'),
+              validator: Validators.required(
+                'Falta el nombre o descripción de la incidencia.',
+              ),
             ),
           ],
         ),
@@ -118,7 +125,8 @@ class _IncidentFormContent extends StatelessWidget {
               allowDeselect: false,
               required: true,
               iconColorOf: (s) => s.color(c),
-              helper: 'Leve: manchas aisladas o daño menor. Crítica: pone en riesgo la cosecha.',
+              helper:
+                  'Leve: manchas aisladas o daño menor. Crítica: pone en riesgo la cosecha.',
             ),
             DateChipsField(
               label: 'Fecha de detección u ocurrencia',
@@ -145,19 +153,22 @@ class _IncidentFormContent extends StatelessWidget {
         // Acción tomada y notas expandibles
         MoreDetails(
           label: 'Agregar acción tomada y notas',
-          initiallyExpanded: controller.actionTakenController.text.isNotEmpty ||
+          initiallyExpanded:
+              controller.actionTakenController.text.isNotEmpty ||
               controller.notesController.text.isNotEmpty,
           children: [
             AppTextField.notes(
               label: 'Acción tomada o manejo de rescate',
               controller: controller.actionTakenController,
-              hint: 'ej. Se aplicó insecticida de choque, se abrieron zanjas de drenaje...',
+              hint:
+                  'ej. Se aplicó insecticida de choque, se abrieron zanjas de drenaje...',
               helper: 'Describa qué hizo para controlar la situación.',
             ),
             AppTextField.notes(
               label: 'Notas adicionales',
               controller: controller.notesController,
-              hint: 'Porcentaje aproximado del lote afectado, surcos con mayor daño...',
+              hint:
+                  'Porcentaje aproximado del lote afectado, surcos con mayor daño...',
             ),
           ],
         ),
@@ -199,7 +210,8 @@ class _CyclePickerField extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione la siembra correspondiente' : null,
+          validator: (val) =>
+              val == null ? 'Seleccione la siembra correspondiente' : null,
           decoration: const InputDecoration(
             hintText: 'Seleccione la siembra...',
           ),

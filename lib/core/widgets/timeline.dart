@@ -50,32 +50,31 @@ class TimelineItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return IntrinsicHeight(
+    return CustomPaint(
+      painter: _TimelineLinePainter(
+        lineColor: c.outline,
+        lineWidth: 2.0,
+        nodeCenterX: 20.0,
+        nodeCenterY: AppSpace.sm + (AppSize.timelineNode / 2),
+        isFirst: isFirst,
+        isLast: isLast,
+      ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 40,
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                Positioned(
-                  top: isFirst ? AppSpace.lg : 0,
-                  bottom: isLast ? null : 0,
-                  height: isLast ? AppSpace.lg : null,
-                  child: Container(width: 2, color: c.outline),
+            child: Padding(
+              padding: const EdgeInsets.only(top: AppSpace.sm),
+              child: Center(
+                child: CircleIcon(
+                  icon: icon,
+                  size: AppSize.timelineNode,
+                  iconSize: AppSize.iconBadge + 2,
+                  background: nodeColor ?? c.primarySoft,
+                  foreground: iconColor ?? c.onPrimarySoft,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: AppSpace.sm),
-                  child: CircleIcon(
-                    icon: icon,
-                    size: AppSize.timelineNode,
-                    iconSize: AppSize.iconBadge + 2,
-                    background: nodeColor ?? c.primarySoft,
-                    foreground: iconColor ?? c.onPrimarySoft,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(width: AppSpace.md),
@@ -88,5 +87,54 @@ class TimelineItem extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _TimelineLinePainter extends CustomPainter {
+  const _TimelineLinePainter({
+    required this.lineColor,
+    required this.lineWidth,
+    required this.nodeCenterX,
+    required this.nodeCenterY,
+    required this.isFirst,
+    required this.isLast,
+  });
+
+  final Color lineColor;
+  final double lineWidth;
+  final double nodeCenterX;
+  final double nodeCenterY;
+  final bool isFirst;
+  final bool isLast;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (isFirst && isLast) return;
+
+    final paint = Paint()
+      ..color = lineColor
+      ..strokeWidth = lineWidth
+      ..style = PaintingStyle.stroke;
+
+    final startY = isFirst ? nodeCenterY : 0.0;
+    final endY = isLast ? nodeCenterY : size.height;
+
+    if (endY > startY) {
+      canvas.drawLine(
+        Offset(nodeCenterX, startY),
+        Offset(nodeCenterX, endY),
+        paint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _TimelineLinePainter oldDelegate) {
+    return oldDelegate.lineColor != lineColor ||
+        oldDelegate.lineWidth != lineWidth ||
+        oldDelegate.nodeCenterX != nodeCenterX ||
+        oldDelegate.nodeCenterY != nodeCenterY ||
+        oldDelegate.isFirst != isFirst ||
+        oldDelegate.isLast != isLast;
   }
 }

@@ -32,44 +32,35 @@ class _AppShellState extends State<AppShell> {
 
   void _onAddApplication(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const ApplicationFormView(),
-      ),
+      MaterialPageRoute<void>(builder: (_) => const ApplicationFormView()),
     );
   }
 
   void _onAddTask(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const TaskFormView(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const TaskFormView()));
   }
 
   void _onAddIncident(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const IncidentFormView(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const IncidentFormView()));
   }
 
   void _onAddExpense(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const ExpenseFormView(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute<void>(builder: (_) => const ExpenseFormView()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _views,
-      ),
-      floatingActionButton: _currentIndex != 4 // No tapar en más
+      body: IndexedStack(index: _currentIndex, children: _views),
+      floatingActionButton:
+          _currentIndex !=
+              4 // No tapar en más
           ? QuickAddFab(
               onAddApplication: () => _onAddApplication(context),
               onAddTask: () => _onAddTask(context),

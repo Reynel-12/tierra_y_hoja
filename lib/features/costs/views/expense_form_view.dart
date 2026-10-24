@@ -14,11 +14,7 @@ import '../models/cost_models.dart';
 
 /// Plantilla C: Registro de Gasto o Compra Invertida.
 class ExpenseFormView extends StatelessWidget {
-  const ExpenseFormView({
-    super.key,
-    this.expenseToEdit,
-    this.initialCycleId,
-  });
+  const ExpenseFormView({super.key, this.expenseToEdit, this.initialCycleId});
 
   final Expense? expenseToEdit;
   final int? initialCycleId;
@@ -67,7 +63,8 @@ class _ExpenseFormContent extends StatelessWidget {
           children: [
             if (controller.availableCycles.isEmpty)
               const FieldError(
-                message: 'No hay siembras registradas. Primero registre una siembra.',
+                message:
+                    'No hay siembras registradas. Primero registre una siembra.',
               )
             else
               _CyclePicker(
@@ -79,7 +76,8 @@ class _ExpenseFormContent extends StatelessWidget {
               label: 'Categoría de gasto',
               options: ExpenseCategory.values,
               value: controller.selectedCategory,
-              onChanged: (cat) => controller.setCategory(cat ?? ExpenseCategory.insumos),
+              onChanged: (cat) =>
+                  controller.setCategory(cat ?? ExpenseCategory.insumos),
               allowDeselect: false,
               required: true,
             ),
@@ -98,11 +96,15 @@ class _ExpenseFormContent extends StatelessWidget {
             AppTextField(
               label: 'Monto total invertido',
               controller: controller.amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               prefixText: 'L ',
               required: true,
               hint: '0.00',
-              validator: Validators.requiredMoney('Ingrese el monto gastado en Lempiras.'),
+              validator: Validators.requiredMoney(
+                'Ingrese el monto gastado en Lempiras.',
+              ),
             ),
             Row(
               children: [
@@ -110,7 +112,9 @@ class _ExpenseFormContent extends StatelessWidget {
                   child: AppTextField(
                     label: 'Cantidad (opcional)',
                     controller: controller.quantityController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     hint: 'ej. 3',
                     validator: Validators.optionalNumber,
                   ),
@@ -120,7 +124,9 @@ class _ExpenseFormContent extends StatelessWidget {
                   child: AppTextField(
                     label: 'Precio unitario (L)',
                     controller: controller.unitPriceController,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     prefixText: 'L ',
                     hint: 'ej. 650',
                     validator: Validators.optionalNumber,
@@ -145,7 +151,8 @@ class _ExpenseFormContent extends StatelessWidget {
             AppTextField.notes(
               label: 'Notas del gasto',
               controller: controller.notesController,
-              hint: 'ej. Comprado en Agrocomercial El Triunfo, con factura #1042',
+              hint:
+                  'ej. Comprado en Agrocomercial El Triunfo, con factura #1042',
             ),
           ],
         ),
@@ -187,7 +194,8 @@ class _CyclePicker extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione la siembra correspondiente' : null,
+          validator: (val) =>
+              val == null ? 'Seleccione la siembra correspondiente' : null,
           decoration: const InputDecoration(
             hintText: 'Seleccione la siembra...',
           ),

@@ -25,6 +25,7 @@ import '../../field_log/views/follow_up_form_view.dart';
 import '../../history/data/history_repository.dart';
 import '../../history/models/experience_models.dart';
 import '../../history/views/cycle_timeline_view.dart';
+import '../../history/views/event_detail_sheet.dart';
 import '../controllers/cycle_controllers.dart';
 import '../data/cycle_repository.dart';
 import '../models/crop_cycle.dart';
@@ -51,15 +52,18 @@ class CycleDetailView extends StatelessWidget {
   }
 }
 
-
 class _CycleDetailContent extends StatelessWidget {
   const _CycleDetailContent();
 
-  Future<void> _delete(BuildContext context, CycleDetailController controller) async {
+  Future<void> _delete(
+    BuildContext context,
+    CycleDetailController controller,
+  ) async {
     final confirmed = await showConfirmDialog(
       context,
       title: '¿Eliminar esta siembra?',
-      message: 'Se borrarán también las aplicaciones, labores y cuentas de este ciclo.',
+      message:
+          'Se borrarán también las aplicaciones, labores y cuentas de este ciclo.',
       confirmLabel: 'Eliminar siembra',
       destructive: true,
     );
@@ -240,7 +244,9 @@ class _CycleDetailContent extends StatelessWidget {
 
                   // Si el ciclo está cerrado, mostrar los resultados de la cosecha
                   if (cycle.isClosed) ...[
-                    const SectionHeader(title: 'Resultados de cosecha y cierre'),
+                    const SectionHeader(
+                      title: 'Resultados de cosecha y cierre',
+                    ),
                     AccentCard(
                       accentColor: c.positive,
                       child: Column(
@@ -248,16 +254,24 @@ class _CycleDetailContent extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              CircleIcon(icon: AppIcons.harvest, color: c.positive),
+                              CircleIcon(
+                                icon: AppIcons.harvest,
+                                color: c.positive,
+                              ),
                               const SizedBox(width: AppSpace.md),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Cosecha finalizada', style: t.titleSm),
+                                    Text(
+                                      'Cosecha finalizada',
+                                      style: t.titleSm,
+                                    ),
                                     Text(
                                       'Rendimiento total: ${cycle.yieldDisplay}',
-                                      style: t.displaySm.copyWith(color: c.positive),
+                                      style: t.displaySm.copyWith(
+                                        color: c.positive,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -270,17 +284,22 @@ class _CycleDetailContent extends StatelessWidget {
                                 ),
                             ],
                           ),
-                          if (cycle.whatWorked != null && cycle.whatWorked!.isNotEmpty) ...[
+                          if (cycle.whatWorked != null &&
+                              cycle.whatWorked!.isNotEmpty) ...[
                             const SizedBox(height: AppSpace.md),
                             const Divider(),
                             Text('¿Qué funcionó bien?:', style: t.label),
                             const SizedBox(height: 2),
                             Text(cycle.whatWorked!, style: t.body),
                           ],
-                          if (cycle.whatFailed != null && cycle.whatFailed!.isNotEmpty) ...[
+                          if (cycle.whatFailed != null &&
+                              cycle.whatFailed!.isNotEmpty) ...[
                             const SizedBox(height: AppSpace.md),
                             const Divider(),
-                            Text('¿Qué falló o debe mejorarse?:', style: t.label),
+                            Text(
+                              '¿Qué falló o debe mejorarse?:',
+                              style: t.label,
+                            ),
                             const SizedBox(height: 2),
                             Text(cycle.whatFailed!, style: t.body),
                           ],
@@ -299,7 +318,8 @@ class _CycleDetailContent extends StatelessWidget {
                           child: AppButton.secondary(
                             label: 'Avanzar etapa',
                             icon: AppIcons.cycle,
-                            onPressed: () => _changeStage(context, controller, cycle),
+                            onPressed: () =>
+                                _changeStage(context, controller, cycle),
                           ),
                         ),
                         const SizedBox(width: AppSpace.md),
@@ -326,11 +346,15 @@ class _CycleDetailContent extends StatelessWidget {
                     runSpacing: AppSpace.sm,
                     children: [
                       ActionChip(
-                        avatar: const Icon(AppIcons.application, size: AppSize.iconSm),
+                        avatar: const Icon(
+                          AppIcons.application,
+                          size: AppSize.iconSm,
+                        ),
                         label: const Text('+ Aplicar insumo'),
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
-                            builder: (_) => ApplicationFormView(initialCycleId: cycle.id),
+                            builder: (_) =>
+                                ApplicationFormView(initialCycleId: cycle.id),
                           ),
                         ),
                       ),
@@ -339,16 +363,21 @@ class _CycleDetailContent extends StatelessWidget {
                         label: const Text('+ Labor cultural'),
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
-                            builder: (_) => TaskFormView(initialCycleId: cycle.id),
+                            builder: (_) =>
+                                TaskFormView(initialCycleId: cycle.id),
                           ),
                         ),
                       ),
                       ActionChip(
-                        avatar: const Icon(AppIcons.incident, size: AppSize.iconSm),
+                        avatar: const Icon(
+                          AppIcons.incident,
+                          size: AppSize.iconSm,
+                        ),
                         label: const Text('+ Plaga / Clima'),
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
-                            builder: (_) => IncidentFormView(initialCycleId: cycle.id),
+                            builder: (_) =>
+                                IncidentFormView(initialCycleId: cycle.id),
                           ),
                         ),
                       ),
@@ -358,14 +387,17 @@ class _CycleDetailContent extends StatelessWidget {
 
                   // Eventos y bitácora de la siembra
                   SectionHeader(
-                    title: 'Eventos de esta siembra (${controller.events.length})',
-                    actionLabel: controller.events.isNotEmpty ? 'Ver bitácora' : null,
+                    title:
+                        'Eventos de esta siembra (${controller.events.length})',
+                    actionLabel: controller.events.isNotEmpty
+                        ? 'Ver bitácora'
+                        : null,
                     onAction: controller.events.isNotEmpty
                         ? () => Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => CycleTimelineView(cycle: cycle),
-                              ),
-                            )
+                            MaterialPageRoute<void>(
+                              builder: (_) => CycleTimelineView(cycle: cycle),
+                            ),
+                          )
                         : null,
                   ),
                   if (controller.events.isEmpty)
@@ -378,7 +410,10 @@ class _CycleDetailContent extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Aún no hay eventos registrados', style: t.titleSm),
+                                Text(
+                                  'Aún no hay eventos registrados',
+                                  style: t.titleSm,
+                                ),
                                 const SizedBox(height: 2),
                                 Text(
                                   'Registre insumos, labores o incidencias con los botones de arriba para consultar el historial aquí mismo.',
@@ -403,17 +438,22 @@ class _CycleDetailContent extends StatelessWidget {
                             TimelineEventType.plaga,
                           ]) ...[
                             Padding(
-                              padding: const EdgeInsets.only(right: AppSpace.xs),
+                              padding: const EdgeInsets.only(
+                                right: AppSpace.xs,
+                              ),
                               child: FilterChip(
-                                avatar: Icon(filter.icon, size: AppSize.iconBadge),
+                                avatar: Icon(
+                                  filter.icon,
+                                  size: AppSize.iconBadge,
+                                ),
                                 label: Text(
                                   filter == TimelineEventType.todos
                                       ? 'Todos (${controller.events.length})'
                                       : filter == TimelineEventType.insumo
-                                          ? 'Insumos (${controller.events.where((e) => e.type == TimelineEventType.insumo).length})'
-                                          : filter == TimelineEventType.labor
-                                              ? 'Labores (${controller.events.where((e) => e.type == TimelineEventType.labor).length})'
-                                              : 'Plagas (${controller.events.where((e) => e.type == TimelineEventType.plaga).length})',
+                                      ? 'Insumos (${controller.events.where((e) => e.type == TimelineEventType.insumo).length})'
+                                      : filter == TimelineEventType.labor
+                                      ? 'Labores (${controller.events.where((e) => e.type == TimelineEventType.labor).length})'
+                                      : 'Plagas (${controller.events.where((e) => e.type == TimelineEventType.plaga).length})',
                                 ),
                                 selected: controller.selectedFilter == filter,
                                 onSelected: (_) => controller.setFilter(filter),
@@ -427,7 +467,9 @@ class _CycleDetailContent extends StatelessWidget {
                     if (controller.filteredEvents.isEmpty)
                       AppCard(
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: AppSpace.sm),
+                          padding: const EdgeInsets.symmetric(
+                            vertical: AppSpace.sm,
+                          ),
                           child: Center(
                             child: Text(
                               'No hay eventos de este tipo en esta siembra',
@@ -455,9 +497,15 @@ class _CycleDetailContent extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Costos y Ventas de este lote', style: t.titleSm),
+                              Text(
+                                'Costos y Ventas de este lote',
+                                style: t.titleSm,
+                              ),
                               const SizedBox(height: 2),
-                              Text('Insumos, jornales, compras y liquidaciones', style: t.bodySm),
+                              Text(
+                                'Insumos, jornales, compras y liquidaciones',
+                                style: t.bodySm,
+                              ),
                             ],
                           ),
                         ),
@@ -484,7 +532,11 @@ class _CycleDetailContent extends StatelessWidget {
                     AppCard(
                       child: Column(
                         children: [
-                          for (var i = 0; i < controller.stageEvents.length; i++) ...[
+                          for (
+                            var i = 0;
+                            i < controller.stageEvents.length;
+                            i++
+                          ) ...[
                             if (i > 0) const Divider(),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -492,7 +544,8 @@ class _CycleDetailContent extends StatelessWidget {
                                 children: [
                                   CircleIcon(
                                     icon: controller.stageEvents[i].stage.icon,
-                                    color: controller.stageEvents[i].stage.color(c),
+                                    color: controller.stageEvents[i].stage
+                                        .color(c),
                                   ),
                                   const SizedBox(width: AppSpace.md),
                                   Expanded(
@@ -502,7 +555,9 @@ class _CycleDetailContent extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    Formatters.date(controller.stageEvents[i].date),
+                                    Formatters.date(
+                                      controller.stageEvents[i].date,
+                                    ),
                                     style: t.label,
                                   ),
                                 ],
@@ -529,30 +584,36 @@ class _CycleEventCard extends StatelessWidget {
   final UnifiedTimelineItem item;
 
   Color _getEventColor(AppColors c, TimelineEventType type) => switch (type) {
-        TimelineEventType.insumo => c.primary,
-        TimelineEventType.labor => c.accentText,
-        TimelineEventType.plaga => c.negative,
-        TimelineEventType.etapa => c.info,
-        TimelineEventType.cosecha => c.positive,
-        _ => c.primary,
-      };
+    TimelineEventType.insumo => c.primary,
+    TimelineEventType.labor => c.accentText,
+    TimelineEventType.plaga => c.negative,
+    TimelineEventType.etapa => c.info,
+    TimelineEventType.cosecha => c.positive,
+    _ => c.primary,
+  };
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
     final t = context.t;
+    final color = _getEventColor(c, item.type);
+    final app = item.application;
+    final task = item.task;
+    final incident = item.incident;
 
     return AppCard(
+      onTap: () => EventDetailSheet.show(
+        context,
+        item: item,
+        showCycleNavigation: false,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleIcon(
-                icon: item.icon,
-                color: _getEventColor(c, item.type),
-              ),
+              CircleIcon(icon: item.icon, color: color),
               const SizedBox(width: AppSpace.md),
               Expanded(
                 child: Column(
@@ -560,30 +621,60 @@ class _CycleEventCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Expanded(
-                          child: Text(
-                            item.title,
-                            style: t.titleSm,
-                          ),
-                        ),
-                        Text(
-                          Formatters.date(item.date),
-                          style: t.caption,
-                        ),
+                        Expanded(child: Text(item.title, style: t.titleSm)),
+                        Text(Formatters.date(item.date), style: t.caption),
                       ],
                     ),
                     if (item.subtitle != null) ...[
                       const SizedBox(height: 2),
                       Text(item.subtitle!, style: t.bodySm),
                     ],
-                    if (item.badgeText != null) ...[
-                      const SizedBox(height: AppSpace.xs),
-                      StatusBadge(
-                        label: item.badgeText!,
-                        icon: AppIcons.check,
-                        color: _getEventColor(c, item.type),
-                      ),
-                    ],
+
+                    // Chips compactos de contexto y condiciones de aplicación
+                    const SizedBox(height: AppSpace.xs),
+                    Wrap(
+                      spacing: AppSpace.xs,
+                      runSpacing: AppSpace.xs,
+                      children: [
+                        if (app?.method != null && app!.method!.isNotEmpty)
+                          _CompactChip(
+                            icon: AppIcons.tractor,
+                            label: app.method!,
+                          ),
+                        if (app?.weather != null)
+                          _CompactChip(
+                            icon: app!.weather!.icon,
+                            label: app.weather!.label,
+                          ),
+                        if (app?.timeOfDay != null)
+                          _CompactChip(
+                            icon: app!.timeOfDay!.icon,
+                            label: app.timeOfDay!.label,
+                          ),
+                        if (task?.method != null && task!.method!.isNotEmpty)
+                          _CompactChip(
+                            icon: AppIcons.task,
+                            label: task.method!,
+                          ),
+                        if (incident != null)
+                          _CompactChip(
+                            icon: incident.kind.icon,
+                            label: incident.kind.label,
+                          ),
+                        if (item.badgeText != null)
+                          StatusBadge(
+                            label: item.badgeText!,
+                            icon: AppIcons.check,
+                            color: color,
+                          ),
+                        if (app != null && app.isPendingReview)
+                          StatusBadge(
+                            label: 'Revisión pendiente',
+                            icon: AppIcons.clock,
+                            color: c.accent,
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -593,59 +684,46 @@ class _CycleEventCard extends StatelessWidget {
             const SizedBox(height: AppSpace.sm),
             Text(
               item.notes!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: t.bodySm.copyWith(color: c.ink),
             ),
           ],
           if (item.hasPhotos) ...[
             const SizedBox(height: AppSpace.md),
-            Row(
+            Wrap(
+              spacing: AppSpace.sm,
+              runSpacing: AppSpace.xs,
               children: [
-                if (item.photoBefore != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: AppSpace.sm),
-                    child: GestureDetector(
-                      onTap: () => PhotoViewerPage.open(
-                        context,
-                        before: item.photoBefore,
-                        after: item.photoAfter,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PhotoThumb(
-                            path: item.photoBefore,
-                            size: 56,
-                            semanticLabel: 'Foto antes',
-                          ),
-                          const SizedBox(height: 2),
-                          Text('Antes', style: t.caption),
-                        ],
-                      ),
-                    ),
-                  ),
-                if (item.photoAfter != null)
-                  GestureDetector(
+                if (item.photoBefore != null &&
+                    item.photoBefore!.trim().isNotEmpty)
+                  PhotoPreviewThumb(
+                    path: item.photoBefore!,
+                    label: 'Antes',
+                    size: 56,
                     onTap: () => PhotoViewerPage.open(
                       context,
                       before: item.photoBefore,
                       after: item.photoAfter,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PhotoThumb(
-                          path: item.photoAfter,
-                          size: 56,
-                          semanticLabel: 'Foto después',
-                        ),
-                        const SizedBox(height: 2),
-                        Text('Después', style: t.caption),
-                      ],
+                  ),
+                if (item.photoAfter != null &&
+                    item.photoAfter!.trim().isNotEmpty)
+                  PhotoPreviewThumb(
+                    path: item.photoAfter!,
+                    label: 'Después',
+                    size: 56,
+                    onTap: () => PhotoViewerPage.open(
+                      context,
+                      before: item.photoBefore,
+                      after: item.photoAfter,
                     ),
                   ),
               ],
             ),
           ],
+
+          // Acción rápida si hay evaluación de reacción pendiente
           if (item.application != null &&
               item.application!.needsFollowUp &&
               item.application!.followUpVerdict == null) ...[
@@ -655,14 +733,75 @@ class _CycleEventCard extends StatelessWidget {
               icon: AppIcons.check,
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => FollowUpFormView(application: item.application!),
+                  builder: (_) =>
+                      FollowUpFormView(application: item.application!),
                 ),
               ),
             ),
           ],
+
+          // Enlace a ver detalle completo
+          const SizedBox(height: AppSpace.sm),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    'Ver detalle completo',
+                    style: t.caption.copyWith(
+                      color: c.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                Icon(AppIcons.forward, size: 12, color: c.primary),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+class _CompactChip extends StatelessWidget {
+  const _CompactChip({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final t = context.t;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: c.surfaceRaised,
+        borderRadius: AppRadius.pill,
+        border: Border.all(color: c.outline),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: c.inkMuted),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              label,
+              style: t.caption.copyWith(color: c.inkSoft, fontSize: 11),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

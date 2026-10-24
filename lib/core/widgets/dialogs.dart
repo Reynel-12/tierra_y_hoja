@@ -205,8 +205,7 @@ abstract final class AppToast {
     BuildContext context,
     String message, {
     required VoidCallback onUndo,
-  }) =>
-      _show(context, message, ToastKind.success, onUndo: onUndo);
+  }) => _show(context, message, ToastKind.success, onUndo: onUndo);
 
   static void _show(
     BuildContext context,

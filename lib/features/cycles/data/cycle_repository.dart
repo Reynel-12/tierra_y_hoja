@@ -21,25 +21,31 @@ class CycleRepository {
   }
 
   Future<List<CropCycle>> getByPlot(int plotId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT c.*, p.name as plot_name
       FROM crop_cycles c
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE c.plot_id = ?
       ORDER BY c.planting_date DESC
-    ''', [plotId]);
+    ''',
+      [plotId],
+    );
 
     return results.map(CropCycle.fromRow).toList();
   }
 
   Future<CropCycle?> getById(int id) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT c.*, p.name as plot_name
       FROM crop_cycles c
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE c.id = ?
       LIMIT 1
-    ''', [id]);
+    ''',
+      [id],
+    );
 
     if (results.isEmpty) return null;
     return CropCycle.fromRow(results.first);
@@ -53,7 +59,11 @@ class CycleRepository {
       'stage': cycle.stage.name,
       'date': cycle.plantingDate.millisecondsSinceEpoch,
     });
-    _database.changes.notify({DbTable.cycles, DbTable.plots, DbTable.stageEvents});
+    _database.changes.notify({
+      DbTable.cycles,
+      DbTable.plots,
+      DbTable.stageEvents,
+    });
     return id;
   }
 
@@ -68,7 +78,11 @@ class CycleRepository {
     _database.changes.notify({DbTable.cycles, DbTable.plots});
   }
 
-  Future<void> updateStage(int cycleId, CropStage newStage, DateTime date) async {
+  Future<void> updateStage(
+    int cycleId,
+    CropStage newStage,
+    DateTime date,
+  ) async {
     await _database.db.update(
       'crop_cycles',
       {
@@ -85,7 +99,11 @@ class CycleRepository {
       'date': date.millisecondsSinceEpoch,
     });
 
-    _database.changes.notify({DbTable.cycles, DbTable.stageEvents, DbTable.plots});
+    _database.changes.notify({
+      DbTable.cycles,
+      DbTable.stageEvents,
+      DbTable.plots,
+    });
   }
 
   Future<void> closeCycle({
@@ -122,7 +140,11 @@ class CycleRepository {
       'date': harvestEnd.millisecondsSinceEpoch,
     });
 
-    _database.changes.notify({DbTable.cycles, DbTable.stageEvents, DbTable.plots});
+    _database.changes.notify({
+      DbTable.cycles,
+      DbTable.stageEvents,
+      DbTable.plots,
+    });
   }
 
   Future<void> delete(int id) async {
@@ -156,13 +178,16 @@ class CycleRepository {
   }
 
   Future<List<CropCycle>> getCyclesByCrop(String crop) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT c.*, p.name as plot_name
       FROM crop_cycles c
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE c.crop = ? COLLATE NOCASE
       ORDER BY c.planting_date DESC
-    ''', [crop]);
+    ''',
+      [crop],
+    );
     return results.map(CropCycle.fromRow).toList();
   }
 }

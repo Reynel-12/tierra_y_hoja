@@ -63,7 +63,9 @@ void main() async {
         Provider<CostRepository>.value(value: costRepo),
         Provider<HistoryRepository>.value(value: historyRepo),
         ChangeNotifierProvider(create: (_) => ThemeController(database)),
-        ChangeNotifierProvider<GuidedTourController>.value(value: tourController),
+        ChangeNotifierProvider<GuidedTourController>.value(
+          value: tourController,
+        ),
       ],
       child: const TierraYHojaApp(),
     ),
@@ -89,13 +91,12 @@ class TierraYHojaApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [
-        Locale('es', 'HN'),
-        Locale('es', ''),
-      ],
+      supportedLocales: const [Locale('es', 'HN'), Locale('es', '')],
       home: !tourController.isLoaded
           ? const Scaffold(body: Center(child: CircularProgressIndicator()))
-          : (tourController.isCompleted ? const AppShell() : const GuidedTourView(isRevisit: false)),
+          : (tourController.isCompleted
+                ? const AppShell()
+                : const GuidedTourView(isRevisit: false)),
     );
   }
 }

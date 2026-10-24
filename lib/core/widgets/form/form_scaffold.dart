@@ -310,8 +310,11 @@ class _MoreDetailsState extends State<MoreDetails> {
                   AnimatedRotation(
                     turns: _expanded ? 0.5 : 0,
                     duration: reduced ? Duration.zero : AppMotion.base,
-                    child: Icon(AppIcons.expand,
-                        size: AppSize.iconSm, color: c.primary),
+                    child: Icon(
+                      AppIcons.expand,
+                      size: AppSize.iconSm,
+                      color: c.primary,
+                    ),
                   ),
                 ],
               ),

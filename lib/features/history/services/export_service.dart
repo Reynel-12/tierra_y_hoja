@@ -57,11 +57,17 @@ class ExportService {
                 children: [
                   pw.Text(
                     'Emisión: ${Formatters.date(DateTime.now())}',
-                    style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+                    style: const pw.TextStyle(
+                      fontSize: 10,
+                      color: PdfColors.grey600,
+                    ),
                   ),
                   pw.Text(
                     '100% Registro Offline',
-                    style: const pw.TextStyle(fontSize: 9, color: PdfColors.grey500),
+                    style: const pw.TextStyle(
+                      fontSize: 9,
+                      color: PdfColors.grey500,
+                    ),
                   ),
                 ],
               ),
@@ -84,26 +90,44 @@ class ExportService {
                 pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Cultivo: ${cycle.title}',
-                        style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                    pw.Text(
+                      'Cultivo: ${cycle.title}',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
                     pw.SizedBox(height: 4),
-                    pw.Text('Lote / Parcela: ${cycle.plotName}',
-                        style: const pw.TextStyle(fontSize: 11)),
-                    pw.Text('Fecha de siembra: ${Formatters.date(cycle.plantingDate)}',
-                        style: const pw.TextStyle(fontSize: 11)),
+                    pw.Text(
+                      'Lote / Parcela: ${cycle.plotName}',
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
+                    pw.Text(
+                      'Fecha de siembra: ${Formatters.date(cycle.plantingDate)}',
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
                   ],
                 ),
                 pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Estado actual: ${cycle.stage.label}',
-                        style: const pw.TextStyle(fontSize: 11)),
+                    pw.Text(
+                      'Estado actual: ${cycle.stage.label}',
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
                     if (cycle.densityDisplay.isNotEmpty)
-                      pw.Text('Densidad: ${cycle.densityDisplay}',
-                          style: const pw.TextStyle(fontSize: 11)),
+                      pw.Text(
+                        'Densidad: ${cycle.densityDisplay}',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
                     if (cycle.yieldDisplay.isNotEmpty)
-                      pw.Text('Rendimiento: ${cycle.yieldDisplay}',
-                          style: pw.TextStyle(fontSize: 11, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                        'Rendimiento: ${cycle.yieldDisplay}',
+                        style: pw.TextStyle(
+                          fontSize: 11,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -112,14 +136,22 @@ class ExportService {
           pw.SizedBox(height: 20),
 
           // Balance económico
-          pw.Text('Resumen Económico (Lempiras)',
-              style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            'Resumen Económico (Lempiras)',
+            style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 6),
           pw.Row(
             children: [
-              _buildMetricBox('Total Invertido', Formatters.money(summary.totalExpenses)),
+              _buildMetricBox(
+                'Total Invertido',
+                Formatters.money(summary.totalExpenses),
+              ),
               pw.SizedBox(width: 12),
-              _buildMetricBox('Total Cosechado / Vendido', Formatters.money(summary.totalSales)),
+              _buildMetricBox(
+                'Total Cosechado / Vendido',
+                Formatters.money(summary.totalSales),
+              ),
               pw.SizedBox(width: 12),
               _buildMetricBox(
                 'Balance Neto',
@@ -131,13 +163,17 @@ class ExportService {
           pw.SizedBox(height: 20),
 
           // Tabla de eventos y actividades
-          pw.Text('Historial de Bitácora y Aplicaciones',
-              style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+          pw.Text(
+            'Historial de Bitácora y Aplicaciones',
+            style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
+          ),
           pw.SizedBox(height: 8),
 
           if (events.isEmpty)
-            pw.Text('No hay eventos registrados en esta siembra.',
-                style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600))
+            pw.Text(
+              'No hay eventos registrados en esta siembra.',
+              style: const pw.TextStyle(fontSize: 10, color: PdfColors.grey600),
+            )
           else
             pw.TableHelper.fromTextArray(
               border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
@@ -146,10 +182,17 @@ class ExportService {
                 fontWeight: pw.FontWeight.bold,
                 color: PdfColors.black,
               ),
-              headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
+              headerDecoration: const pw.BoxDecoration(
+                color: PdfColors.grey200,
+              ),
               cellStyle: const pw.TextStyle(fontSize: 9),
               cellHeight: 24,
-              headers: ['Fecha', 'Tipo', 'Detalle / Insumo', 'Notas / Resultado'],
+              headers: [
+                'Fecha',
+                'Tipo',
+                'Detalle / Insumo',
+                'Notas / Resultado',
+              ],
               data: [
                 for (final ev in events)
                   [
@@ -167,10 +210,13 @@ class ExportService {
 
           if (cycle.isClosed &&
               ((cycle.whatWorked != null && cycle.whatWorked!.isNotEmpty) ||
-                  (cycle.whatFailed != null && cycle.whatFailed!.isNotEmpty))) ...[
+                  (cycle.whatFailed != null &&
+                      cycle.whatFailed!.isNotEmpty))) ...[
             pw.SizedBox(height: 20),
-            pw.Text('Lecciones y Aprendizajes de la Cosecha',
-                style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+            pw.Text(
+              'Lecciones y Aprendizajes de la Cosecha',
+              style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold),
+            ),
             pw.SizedBox(height: 6),
             if (cycle.whatWorked != null && cycle.whatWorked!.isNotEmpty)
               pw.Paragraph(
@@ -193,7 +239,11 @@ class ExportService {
     return file;
   }
 
-  pw.Widget _buildMetricBox(String title, String value, {bool isHighlight = false}) {
+  pw.Widget _buildMetricBox(
+    String title,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return pw.Expanded(
       child: pw.Container(
         padding: const pw.EdgeInsets.all(8),
@@ -207,7 +257,10 @@ class ExportService {
         child: pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text(title, style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700)),
+            pw.Text(
+              title,
+              style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey700),
+            ),
             pw.SizedBox(height: 2),
             pw.Text(
               value,

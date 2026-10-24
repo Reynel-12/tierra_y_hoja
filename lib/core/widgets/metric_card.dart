@@ -70,7 +70,11 @@ class MetricCard extends StatelessWidget {
               const SizedBox(height: AppSpace.xs),
               Row(
                 children: [
-                  Icon(trend!.icon, size: AppSize.iconBadge, color: trend!.color),
+                  Icon(
+                    trend!.icon,
+                    size: AppSize.iconBadge,
+                    color: trend!.color,
+                  ),
                   const SizedBox(width: AppSpace.xs),
                   Expanded(
                     child: Text(

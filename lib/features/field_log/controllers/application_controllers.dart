@@ -38,7 +38,9 @@ class ApplicationFormController extends FormController {
     _photoTracker = PhotoTracker(_photoService);
     productNameController = text(initialApp?.productName ?? '');
     doseValueController = text(
-      initialApp?.doseValue != null ? Formatters.editable(initialApp!.doseValue) : '',
+      initialApp?.doseValue != null
+          ? Formatters.editable(initialApp!.doseValue)
+          : '',
     );
     methodController = text(initialApp?.method ?? '');
     notesController = text(initialApp?.notes ?? '');
@@ -53,7 +55,9 @@ class ApplicationFormController extends FormController {
 
     // Calcular recordatorio
     if (initialApp?.reviewDueAt != null) {
-      final diff = initialApp!.reviewDueAt!.difference(initialApp!.appliedAt).inDays;
+      final diff = initialApp!.reviewDueAt!
+          .difference(initialApp!.appliedAt)
+          .inDays;
       if (diff <= 3) {
         selectedReminder = ReminderOption.threeDays;
       } else if (diff <= 5) {
@@ -62,7 +66,8 @@ class ApplicationFormController extends FormController {
         selectedReminder = ReminderOption.sevenDays;
       }
     } else {
-      selectedReminder = ReminderOption.threeDays; // Valor por defecto inteligente
+      selectedReminder =
+          ReminderOption.threeDays; // Valor por defecto inteligente
     }
 
     _loadCycles();
@@ -115,11 +120,14 @@ class ApplicationFormController extends FormController {
 
   void setAppliedAt(DateTime date) => update(() => appliedAt = date);
 
-  void setTimeOfDay(TimeOfDayChoice? time) => update(() => selectedTimeOfDay = time);
+  void setTimeOfDay(TimeOfDayChoice? time) =>
+      update(() => selectedTimeOfDay = time);
 
-  void setWeather(WeatherCondition? condition) => update(() => selectedWeather = condition);
+  void setWeather(WeatherCondition? condition) =>
+      update(() => selectedWeather = condition);
 
-  void setReminder(ReminderOption option) => update(() => selectedReminder = option);
+  void setReminder(ReminderOption option) =>
+      update(() => selectedReminder = option);
 
   void setPhotoBefore(String? path) {
     _photoTracker.replace(oldPath: photoBefore, newPath: path);
@@ -129,7 +137,9 @@ class ApplicationFormController extends FormController {
   @override
   Future<SaveResult> performSave() async {
     if (selectedCycleId == null) {
-      return const SaveFailure('Debe seleccionar la siembra a la que aplica este insumo.');
+      return const SaveFailure(
+        'Debe seleccionar la siembra a la que aplica este insumo.',
+      );
     }
 
     final now = DateTime.now();
@@ -153,13 +163,17 @@ class ApplicationFormController extends FormController {
       productName: productNameController.text.trim(),
       doseValue: doseVal,
       doseUnit: doseVal != null ? selectedDoseUnit : null,
-      method: methodController.text.trim().isEmpty ? null : methodController.text.trim(),
+      method: methodController.text.trim().isEmpty
+          ? null
+          : methodController.text.trim(),
       appliedAt: appliedAt,
       timeOfDay: selectedTimeOfDay,
       weather: selectedWeather,
       reviewDueAt: reviewDue,
       photoBefore: photoBefore,
-      notes: notesController.text.trim().isEmpty ? null : notesController.text.trim(),
+      notes: notesController.text.trim().isEmpty
+          ? null
+          : notesController.text.trim(),
       createdAt: initialApp?.createdAt ?? now,
     );
 
@@ -179,7 +193,8 @@ class ApplicationFormController extends FormController {
         id: savedId,
         at: reviewDue,
         title: 'Revisión de cultivo pendiente',
-        body: 'Es momento de revisar la reacción a ${app.productName}. ¿Cómo respondió la planta?',
+        body:
+            'Es momento de revisar la reacción a ${app.productName}. ¿Cómo respondió la planta?',
         payload: savedId.toString(),
       );
     } else if (isEditing) {
@@ -252,9 +267,11 @@ class FollowUpFormController extends FormController {
   Set<String> selectedSymptoms = {};
   String? photoAfter;
 
-  void setVerdict(ReactionVerdict? verdict) => update(() => selectedVerdict = verdict);
+  void setVerdict(ReactionVerdict? verdict) =>
+      update(() => selectedVerdict = verdict);
 
-  void setSymptoms(Set<String> symptoms) => update(() => selectedSymptoms = symptoms);
+  void setSymptoms(Set<String> symptoms) =>
+      update(() => selectedSymptoms = symptoms);
 
   void setPhotoAfter(String? path) {
     _photoTracker.replace(oldPath: photoAfter, newPath: path);
@@ -297,9 +314,10 @@ class FollowUpFormController extends FormController {
   }
 }
 
-class PendingReviewsController extends LoadableController<List<InputApplication>> {
+class PendingReviewsController
+    extends LoadableController<List<InputApplication>> {
   PendingReviewsController(this._repository, DataChanges changes)
-      : super(changes, watch: {DbTable.applications, DbTable.cycles}) {
+    : super(changes, watch: {DbTable.applications, DbTable.cycles}) {
     load();
   }
 

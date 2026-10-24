@@ -97,7 +97,9 @@ class _LocationFieldState extends State<LocationField> {
           child: Text(
             _message ??
                 'Opcional. Funciona sin internet; el teléfono le pedirá permiso de ubicación.',
-            style: _message == null ? t.caption : t.bodySm.copyWith(color: c.ink),
+            style: _message == null
+                ? t.caption
+                : t.bodySm.copyWith(color: c.ink),
           ),
         ),
       ],

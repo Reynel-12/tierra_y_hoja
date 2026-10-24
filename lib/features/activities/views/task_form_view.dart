@@ -16,11 +16,7 @@ import '../models/activity_models.dart';
 
 /// Plantilla C: Formulario de Labor Cultural.
 class TaskFormView extends StatelessWidget {
-  const TaskFormView({
-    super.key,
-    this.taskToEdit,
-    this.initialCycleId,
-  });
+  const TaskFormView({super.key, this.taskToEdit, this.initialCycleId});
 
   final CulturalTask? taskToEdit;
   final int? initialCycleId;
@@ -49,7 +45,9 @@ class _TaskFormContent extends StatelessWidget {
     final isRiego = controller.selectedTaskType == TaskType.riego;
 
     return FormScaffold(
-      title: controller.isEditing ? 'Editar labor cultural' : 'Nueva labor cultural',
+      title: controller.isEditing
+          ? 'Editar labor cultural'
+          : 'Nueva labor cultural',
       subtitle: 'Registre deshierbe, aporco, riegos, preparación y podas',
       saveLabel: controller.isEditing ? 'Guardar cambios' : 'Guardar labor',
       isDirty: controller.isDirty,
@@ -66,7 +64,8 @@ class _TaskFormContent extends StatelessWidget {
           children: [
             if (controller.availableCycles.isEmpty)
               const FieldError(
-                message: 'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
+                message:
+                    'No hay siembras abiertas. Primero abra un ciclo en la sección de Siembras.',
               )
             else
               _CyclePickerField(
@@ -78,7 +77,8 @@ class _TaskFormContent extends StatelessWidget {
               label: 'Tipo de labor cultural',
               options: TaskType.values,
               value: controller.selectedTaskType,
-              onChanged: (t) => controller.setTaskType(t ?? TaskType.deshierbeChapea),
+              onChanged: (t) =>
+                  controller.setTaskType(t ?? TaskType.deshierbeChapea),
               allowDeselect: false,
               required: true,
             ),
@@ -126,14 +126,16 @@ class _TaskFormContent extends StatelessWidget {
         // Detalles opcionales
         MoreDetails(
           label: 'Agregar método, jornales y notas',
-          initiallyExpanded: controller.methodController.text.isNotEmpty ||
+          initiallyExpanded:
+              controller.methodController.text.isNotEmpty ||
               controller.workersController.text.isNotEmpty ||
               controller.notesController.text.isNotEmpty,
           children: [
             AppTextField(
               label: 'Método o herramienta empleada',
               controller: controller.methodController,
-              hint: 'ej. Manual con azadón, con tractor/arado, motodesbrozadora',
+              hint:
+                  'ej. Manual con azadón, con tractor/arado, motodesbrozadora',
             ),
             AppTextField.number(
               label: 'Cantidad de personas o jornales que participaron',
@@ -144,7 +146,8 @@ class _TaskFormContent extends StatelessWidget {
             AppTextField.notes(
               label: 'Notas adicionales de la labor',
               controller: controller.notesController,
-              hint: 'Observaciones de cómo quedó el surco, condición del suelo...',
+              hint:
+                  'Observaciones de cómo quedó el surco, condición del suelo...',
             ),
           ],
         ),
@@ -186,7 +189,8 @@ class _CyclePickerField extends StatelessWidget {
               ),
           ],
           onChanged: onChanged,
-          validator: (val) => val == null ? 'Seleccione la siembra correspondiente' : null,
+          validator: (val) =>
+              val == null ? 'Seleccione la siembra correspondiente' : null,
           decoration: const InputDecoration(
             hintText: 'Seleccione la siembra...',
           ),

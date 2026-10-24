@@ -12,17 +12,18 @@ import '../../cycles/models/crop_cycle.dart';
 import '../data/history_repository.dart';
 import '../models/experience_models.dart';
 
-class CycleTimelineController extends LoadableController<List<UnifiedTimelineItem>> {
-  CycleTimelineController(
-    this.cycleId,
-    this._repository,
-    DataChanges changes,
-  ) : super(changes, watch: {
+class CycleTimelineController
+    extends LoadableController<List<UnifiedTimelineItem>> {
+  CycleTimelineController(this.cycleId, this._repository, DataChanges changes)
+    : super(
+        changes,
+        watch: {
           DbTable.applications,
           DbTable.tasks,
           DbTable.incidents,
           DbTable.stageEvents,
-        }) {
+        },
+      ) {
     load();
   }
 
@@ -43,19 +44,22 @@ class CycleTimelineController extends LoadableController<List<UnifiedTimelineIte
   }
 
   @override
-  Future<List<UnifiedTimelineItem>> fetch() => _repository.getTimelineForCycle(cycleId);
+  Future<List<UnifiedTimelineItem>> fetch() =>
+      _repository.getTimelineForCycle(cycleId);
 }
 
 class ExperienceSearchController extends ChangeNotifier {
   ExperienceSearchController(this._repository, [DataChanges? changes]) {
     if (changes != null) {
       _subscription = changes.stream.listen((tables) {
-        if (tables.any((t) => [
-              DbTable.applications,
-              DbTable.tasks,
-              DbTable.incidents,
-              DbTable.cycles,
-            ].contains(t))) {
+        if (tables.any(
+          (t) => [
+            DbTable.applications,
+            DbTable.tasks,
+            DbTable.incidents,
+            DbTable.cycles,
+          ].contains(t),
+        )) {
           refresh();
         }
       });
@@ -153,7 +157,6 @@ class ExperienceSearchController extends ChangeNotifier {
   }
 }
 
-
 class ComparisonMetrics {
   const ComparisonMetrics({
     required this.cycleA,
@@ -169,10 +172,7 @@ class ComparisonMetrics {
 }
 
 class CycleComparisonController extends ChangeNotifier {
-  CycleComparisonController(
-    this._cycleRepository,
-    this._costRepository,
-  ) {
+  CycleComparisonController(this._cycleRepository, this._costRepository) {
     _init();
   }
 
@@ -209,7 +209,10 @@ class CycleComparisonController extends ChangeNotifier {
   }
 
   Future<void> compare() async {
-    if (cycleA == null || cycleB == null || cycleA!.id == null || cycleB!.id == null) {
+    if (cycleA == null ||
+        cycleB == null ||
+        cycleA!.id == null ||
+        cycleB!.id == null) {
       metrics = null;
       notifyListeners();
       return;

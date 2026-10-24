@@ -44,7 +44,8 @@ class _AppCardState extends State<AppCard> {
   Widget build(BuildContext context) {
     final c = context.c;
     final interactive = widget.onTap != null || widget.onLongPress != null;
-    final padding = widget.padding ??
+    final padding =
+        widget.padding ??
         EdgeInsets.all(widget.compact ? AppSpace.lg : AppSpace.xl);
 
     final card = DecoratedBox(
@@ -107,7 +108,11 @@ class AccentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.c;
     final acColor = accentColor ?? c.accent;
-    final bgColor = color ?? (accentColor != null ? accentColor!.withValues(alpha: 0.12) : c.accentSoft);
+    final bgColor =
+        color ??
+        (accentColor != null
+            ? accentColor!.withValues(alpha: 0.12)
+            : c.accentSoft);
 
     return ClipRRect(
       borderRadius: AppRadius.card,

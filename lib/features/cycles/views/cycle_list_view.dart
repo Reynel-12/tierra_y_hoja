@@ -82,17 +82,25 @@ class _CycleListContentState extends State<_CycleListContent> {
               child: EmptyState(
                 icon: AppIcons.cycle,
                 title: 'Aún no tiene siembras registradas',
-                message: 'Abra la primera siembra o campaña para comenzar su bitácora de campo.',
+                message:
+                    'Abra la primera siembra o campaña para comenzar su bitácora de campo.',
                 actionLabel: 'Abrir siembra',
                 onAction: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(builder: (_) => const CycleFormView()),
+                  MaterialPageRoute<void>(
+                    builder: (_) => const CycleFormView(),
+                  ),
                 ),
               ),
             );
           }
 
           return ListView(
-            padding: EdgeInsets.fromLTRB(pad, AppSpace.sm, pad, AppSpace.x4 * 2),
+            padding: EdgeInsets.fromLTRB(
+              pad,
+              AppSpace.sm,
+              pad,
+              AppSpace.x4 * 2,
+            ),
             children: [
               ContentWidth(
                 child: Column(
@@ -138,7 +146,8 @@ class _CycleListContentState extends State<_CycleListContent> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: AppSpace.listGap),
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: AppSpace.listGap),
                     itemBuilder: (context, index) {
                       final cycle = filtered[index];
                       return StaggeredEntry(
@@ -147,7 +156,8 @@ class _CycleListContentState extends State<_CycleListContent> {
                           cycle: cycle,
                           onTap: () => Navigator.of(context).push(
                             MaterialPageRoute<void>(
-                              builder: (_) => CycleDetailView(cycleId: cycle.id!),
+                              builder: (_) =>
+                                  CycleDetailView(cycleId: cycle.id!),
                             ),
                           ),
                         ),
@@ -177,7 +187,8 @@ class CycleCard extends StatelessWidget {
 
     return AppCard(
       onTap: onTap,
-      semanticLabel: '${cycle.title} en lote ${cycle.plotName}. Estado: ${cycle.stage.label}',
+      semanticLabel:
+          '${cycle.title} en lote ${cycle.plotName}. Estado: ${cycle.stage.label}',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -192,7 +203,11 @@ class CycleCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Row(
                       children: [
-                        Icon(AppIcons.plot, size: AppSize.iconBadge, color: c.inkMuted),
+                        Icon(
+                          AppIcons.plot,
+                          size: AppSize.iconBadge,
+                          color: c.inkMuted,
+                        ),
                         const SizedBox(width: AppSpace.xs),
                         Expanded(
                           child: Text(
@@ -217,7 +232,9 @@ class CycleCard extends StatelessWidget {
           const SizedBox(height: AppSpace.md),
           AppProgressBar(
             value: cycle.estimatedProgress,
-            label: cycle.isClosed ? 'Cosechado' : 'Día ${cycle.daysSincePlanting}',
+            label: cycle.isClosed
+                ? 'Cosechado'
+                : 'Día ${cycle.daysSincePlanting}',
           ),
           if (cycle.isClosed && cycle.yieldValue != null) ...[
             const SizedBox(height: AppSpace.sm),

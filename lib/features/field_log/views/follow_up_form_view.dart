@@ -61,15 +61,9 @@ class _FollowUpFormContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'APLICACIÓN REALIZADA',
-                style: t.overline,
-              ),
+              Text('APLICACIÓN REALIZADA', style: t.overline),
               const SizedBox(height: AppSpace.xs),
-              Text(
-                application.productName,
-                style: t.title,
-              ),
+              Text(application.productName, style: t.title),
               const SizedBox(height: 2),
               Text(
                 'Aplicado el ${Formatters.date(application.appliedAt)} · Dosis: ${application.doseDisplay}',
@@ -114,7 +108,8 @@ class _FollowUpFormContent extends StatelessWidget {
               label: 'Descripción de la reacción',
               controller: controller.reactionNotesController,
               hint: 'ej. Follaje notablemente más verde y con vigor nuevo...',
-              helper: 'Puede tocar el micrófono para dictar sus observaciones con la voz.',
+              helper:
+                  'Puede tocar el micrófono para dictar sus observaciones con la voz.',
             ),
           ],
         ),
@@ -127,9 +122,11 @@ class _FollowUpFormContent extends StatelessWidget {
               label: 'Foto del cultivo después de la aplicación',
               path: controller.photoAfter,
               onChanged: controller.setPhotoAfter,
-              helper: 'Permitirá ver la comparación antes/después en el cuaderno de aprendizaje.',
+              helper:
+                  'Permitirá ver la comparación antes/después en el cuaderno de aprendizaje.',
             ),
-            if (application.photoBefore != null && controller.photoAfter != null) ...[
+            if (application.photoBefore != null &&
+                controller.photoAfter != null) ...[
               const SizedBox(height: AppSpace.md),
               const FieldLabel('Vista previa de la comparación:'),
               BeforeAfterPhotos(

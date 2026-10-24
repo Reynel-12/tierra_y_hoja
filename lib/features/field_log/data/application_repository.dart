@@ -8,14 +8,17 @@ class ApplicationRepository {
   final AppDatabase _database;
 
   Future<List<InputApplication>> getByCycle(int cycleId) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT a.*, c.crop as crop_title, p.name as plot_name
       FROM input_applications a
       INNER JOIN crop_cycles c ON c.id = a.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE a.cycle_id = ?
       ORDER BY a.applied_at DESC
-    ''', [cycleId]);
+    ''',
+      [cycleId],
+    );
 
     return results.map(InputApplication.fromRow).toList();
   }
@@ -34,14 +37,17 @@ class ApplicationRepository {
   }
 
   Future<InputApplication?> getById(int id) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT a.*, c.crop as crop_title, p.name as plot_name
       FROM input_applications a
       INNER JOIN crop_cycles c ON c.id = a.cycle_id
       INNER JOIN plots p ON p.id = c.plot_id
       WHERE a.id = ?
       LIMIT 1
-    ''', [id]);
+    ''',
+      [id],
+    );
 
     if (results.isEmpty) return null;
     return InputApplication.fromRow(results.first);
@@ -88,13 +94,18 @@ class ApplicationRepository {
   }
 
   Future<void> delete(int id) async {
-    await _database.db.delete('input_applications', where: 'id = ?', whereArgs: [id]);
+    await _database.db.delete(
+      'input_applications',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
     _database.changes.notify({DbTable.applications});
   }
 
   Future<List<InputApplication>> searchExperience(String query) async {
     final term = '%$query%';
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT a.*, c.crop as crop_title, p.name as plot_name
       FROM input_applications a
       INNER JOIN crop_cycles c ON c.id = a.cycle_id
@@ -106,7 +117,9 @@ class ApplicationRepository {
          OR c.crop LIKE ?
          OR p.soil_texture LIKE ?
       ORDER BY a.applied_at DESC
-    ''', [term, term, term, term, term, term]);
+    ''',
+      [term, term, term, term, term, term],
+    );
 
     return results.map(InputApplication.fromRow).toList();
   }

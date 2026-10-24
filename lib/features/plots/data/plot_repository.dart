@@ -23,13 +23,16 @@ class PlotRepository {
   }
 
   Future<Plot?> getById(int id) async {
-    final results = await _database.db.rawQuery('''
+    final results = await _database.db.rawQuery(
+      '''
       SELECT p.*, 
         (SELECT c.crop FROM crop_cycles c WHERE c.plot_id = p.id AND c.stage != 'done' ORDER BY c.id DESC LIMIT 1) as active_crop
       FROM plots p
       WHERE p.id = ?
       LIMIT 1
-    ''', [id]);
+    ''',
+      [id],
+    );
 
     if (results.isEmpty) return null;
     final row = results.first;
@@ -59,7 +62,9 @@ class PlotRepository {
   }
 
   Future<int> count() async {
-    final count = await _database.db.rawQuery('SELECT COUNT(*) as count FROM plots');
+    final count = await _database.db.rawQuery(
+      'SELECT COUNT(*) as count FROM plots',
+    );
     if (count.isEmpty) return 0;
     return (count.first['count'] as num?)?.toInt() ?? 0;
   }

@@ -75,15 +75,14 @@ class _AppTopBarState extends State<AppTopBar> {
       backgroundColor: widget.backgroundColor ?? c.bg,
       titleSpacing: hasLeading ? AppSpace.xs : context.screenPadding,
       shape: Border(
-        bottom: BorderSide(
-          color: _scrolled ? c.outline : Colors.transparent,
-        ),
+        bottom: BorderSide(color: _scrolled ? c.outline : Colors.transparent),
       ),
       leading: hasLeading
           ? IconButton(
               tooltip: widget.closeStyle ? 'Cerrar' : 'Atrás',
               icon: Icon(widget.closeStyle ? AppIcons.close : AppIcons.back),
-              onPressed: widget.onBack ?? () => Navigator.of(context).maybePop(),
+              onPressed:
+                  widget.onBack ?? () => Navigator.of(context).maybePop(),
             )
           : null,
       title: widget.title == null

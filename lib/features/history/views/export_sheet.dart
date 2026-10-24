@@ -87,10 +87,7 @@ class _ExportSheetState extends State<ExportSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Reporte oficial de campo en PDF',
-                      style: t.titleSm,
-                    ),
+                    Text('Reporte oficial de campo en PDF', style: t.titleSm),
                     const SizedBox(height: 2),
                     Text(
                       'Documento limpio con fondo blanco y tablas claras, ideal para imprimir o enviar por WhatsApp a técnicos y cooperativas.',

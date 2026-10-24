@@ -157,10 +157,17 @@ class FieldError extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(AppIcons.warning, size: AppSize.iconBadge + 2, color: c.negative),
+          Icon(
+            AppIcons.warning,
+            size: AppSize.iconBadge + 2,
+            color: c.negative,
+          ),
           const SizedBox(width: AppSpace.sm),
           Expanded(
-            child: Text(message, style: context.t.bodySm.copyWith(color: c.ink)),
+            child: Text(
+              message,
+              style: context.t.bodySm.copyWith(color: c.ink),
+            ),
           ),
         ],
       ),
@@ -213,8 +220,7 @@ class AppChoiceChips<T extends ChoiceOption> extends StatelessWidget {
               iconColor: iconColorOf?.call(option),
               selected: option == value,
               onTap: () {
-                final next =
-                    option == value && allowDeselect ? null : option;
+                final next = option == value && allowDeselect ? null : option;
                 onChanged(next);
                 revalidate();
               },
@@ -400,22 +406,22 @@ class _Segment extends StatelessWidget {
           child: iconWidget == null
               ? text
               : stacked
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        iconWidget,
-                        const SizedBox(height: AppSpace.xs),
-                        text,
-                      ],
-                    )
-                  : Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        iconWidget,
-                        const SizedBox(width: AppSpace.sm - 2),
-                        Flexible(child: text),
-                      ],
-                    ),
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    iconWidget,
+                    const SizedBox(height: AppSpace.xs),
+                    text,
+                  ],
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    iconWidget,
+                    const SizedBox(width: AppSpace.sm - 2),
+                    Flexible(child: text),
+                  ],
+                ),
         ),
       ),
     );

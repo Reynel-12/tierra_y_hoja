@@ -12,7 +12,7 @@ import '../models/plot.dart';
 
 class PlotListController extends LoadableController<List<Plot>> {
   PlotListController(this._repository, DataChanges changes)
-      : super(changes, watch: {DbTable.plots, DbTable.cycles}) {
+    : super(changes, watch: {DbTable.plots, DbTable.cycles}) {
     load();
   }
 
@@ -41,7 +41,7 @@ class PlotListController extends LoadableController<List<Plot>> {
 
 class PlotDetailController extends LoadableController<Plot?> {
   PlotDetailController(this.plotId, this._repository, DataChanges changes)
-      : super(changes, watch: {DbTable.plots, DbTable.cycles}) {
+    : super(changes, watch: {DbTable.plots, DbTable.cycles}) {
     load();
   }
 
@@ -62,14 +62,12 @@ class PlotDetailController extends LoadableController<Plot?> {
 }
 
 class PlotFormController extends FormController {
-  PlotFormController(
-    this._repository,
-    this._photoService, {
-    this.initialPlot,
-  }) {
+  PlotFormController(this._repository, this._photoService, {this.initialPlot}) {
     _photoTracker = PhotoTracker(_photoService);
     nameController = text(initialPlot?.name ?? '');
-    areaController = text(initialPlot != null ? Formatters.editable(initialPlot!.area) : '');
+    areaController = text(
+      initialPlot != null ? Formatters.editable(initialPlot!.area) : '',
+    );
     previousCropsController = text(initialPlot?.previousCrops ?? '');
 
     selectedAreaUnit = initialPlot?.areaUnit ?? AreaUnit.manzanas;
@@ -105,15 +103,18 @@ class PlotFormController extends FormController {
   void setAreaUnit(AreaUnit unit) => update(() => selectedAreaUnit = unit);
 
   void setLocation(double? lat, double? lng) => update(() {
-        latitude = lat;
-        longitude = lng;
-      });
+    latitude = lat;
+    longitude = lng;
+  });
 
-  void setSoilTexture(SoilTexture? texture) => update(() => selectedSoilTexture = texture);
+  void setSoilTexture(SoilTexture? texture) =>
+      update(() => selectedSoilTexture = texture);
 
-  void setTopography(Topography? topo) => update(() => selectedTopography = topo);
+  void setTopography(Topography? topo) =>
+      update(() => selectedTopography = topo);
 
-  void setWaterAccess(WaterAccess? access) => update(() => selectedWaterAccess = access);
+  void setWaterAccess(WaterAccess? access) =>
+      update(() => selectedWaterAccess = access);
 
   void setPhoto(String? path) {
     _photoTracker.replace(oldPath: photoPath, newPath: path);
@@ -135,7 +136,9 @@ class PlotFormController extends FormController {
       soilTexture: selectedSoilTexture,
       topography: selectedTopography,
       waterAccess: selectedWaterAccess,
-      previousCrops: previousCropsController.text.trim().isEmpty ? null : previousCropsController.text.trim(),
+      previousCrops: previousCropsController.text.trim().isEmpty
+          ? null
+          : previousCropsController.text.trim(),
       photoPath: photoPath,
       createdAt: initialPlot?.createdAt ?? now,
       updatedAt: now,
