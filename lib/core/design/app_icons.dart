@@ -112,4 +112,5 @@ abstract final class AppIcons {
   static const IconData sun = PhosphorIconsRegular.sun;
   static const IconData moon = PhosphorIconsRegular.moon;
   static const IconData system = PhosphorIconsRegular.circleHalf;
+  static const IconData copy = PhosphorIconsRegular.copy;
 }

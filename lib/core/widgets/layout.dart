@@ -251,11 +251,13 @@ class InfoLine extends StatelessWidget {
     required this.label,
     required this.value,
     this.icon,
+    this.trailing,
   });
 
   final String label;
   final String value;
   final IconData? icon;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -264,11 +266,12 @@ class InfoLine extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpace.sm),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            trailing != null ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           if (icon != null) ...[
             Padding(
-              padding: const EdgeInsets.only(top: 2),
+              padding: EdgeInsets.only(top: trailing != null ? 0 : 2),
               child: Icon(icon, size: AppSize.iconSm, color: c.inkSoft),
             ),
             const SizedBox(width: AppSpace.md),
@@ -283,6 +286,10 @@ class InfoLine extends StatelessWidget {
               ],
             ),
           ),
+          if (trailing != null) ...[
+            const SizedBox(width: AppSpace.sm),
+            trailing!,
+          ],
         ],
       ),
     );

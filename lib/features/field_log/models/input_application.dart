@@ -4,6 +4,9 @@ import '../../../core/database/row_reader.dart';
 import '../../../core/design/app_icons.dart';
 import '../../../core/utils/choice_option.dart';
 import '../../../core/widgets/form/verdict_tiles.dart';
+import 'symptoms_data.dart';
+
+export 'symptoms_data.dart';
 
 /// Tipo de insumo agrícola aplicado al cultivo.
 enum InputType implements ChoiceOption {
@@ -152,6 +155,9 @@ class InputApplication {
         : doseValue.toString();
     return '$val ${doseUnit?.label ?? ''}';
   }
+
+  /// Desglosa los síntomas registrados en chips estándar y notas de fitotoxicidad.
+  SymptomsData get parsedSymptoms => SymptomsData.parse(symptoms);
 
   factory InputApplication.fromRow(
     Map<String, Object?> row, {

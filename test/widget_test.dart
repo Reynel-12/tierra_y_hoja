@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tierra_y_hoja/core/database/data_changes.dart';
+import 'package:tierra_y_hoja/core/design/app_icons.dart';
 import 'package:tierra_y_hoja/core/design/app_theme.dart';
 import 'package:tierra_y_hoja/core/widgets/form/verdict_tiles.dart';
 import 'package:tierra_y_hoja/core/widgets/layout.dart';
 import 'package:tierra_y_hoja/core/widgets/media/photo_widgets.dart';
 import 'package:tierra_y_hoja/features/costs/data/cost_repository.dart';
 import 'package:tierra_y_hoja/features/costs/models/cost_models.dart';
+import 'package:tierra_y_hoja/features/costs/views/cost_detail_sheet.dart';
 import 'package:tierra_y_hoja/features/costs/views/cost_summary_view.dart';
 import 'package:tierra_y_hoja/features/costs/views/expense_form_view.dart';
 import 'package:tierra_y_hoja/features/cycles/data/cycle_repository.dart';
@@ -24,6 +27,7 @@ import 'package:tierra_y_hoja/features/history/views/event_detail_sheet.dart';
 import 'package:tierra_y_hoja/features/history/views/experience_search_view.dart';
 import 'package:tierra_y_hoja/features/plots/data/plot_repository.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
+import 'package:tierra_y_hoja/features/plots/views/plot_detail_view.dart';
 import 'package:tierra_y_hoja/features/tour/controllers/guided_tour_controller.dart';
 import 'package:tierra_y_hoja/features/tour/views/guided_tour_view.dart';
 
@@ -526,6 +530,64 @@ void main() {
     expect(find.text('Excelente respuesta en 3 días'), findsOneWidget);
   });
 
+  testWidgets('EventDetailSheet renders negative reaction with separate symptom chips and legible phytotoxicity notes', (tester) async {
+    final now = DateTime.now();
+    final item = UnifiedTimelineItem(
+      id: 2,
+      type: TimelineEventType.insumo,
+      cycleId: 1,
+      title: 'Herbicida Secante',
+      subtitle: 'Dosis: 50 cc/L',
+      date: now,
+      cropTitle: 'Maíz H-59',
+      plotName: 'Lote Norte',
+      application: InputApplication(
+        id: 2,
+        cycleId: 1,
+        inputType: InputType.herbicida,
+        productName: 'Herbicida Secante',
+        appliedAt: now,
+        verdict: ReactionVerdict.negative,
+        symptoms: SymptomsData.format({'Hoja quemada', 'Marchitez'}, 'Quemazón severa por deriva de viento en bordes.'),
+        reactionNotes: 'Se aisló el surco afectado con riego de lavado.',
+        createdAt: now,
+      ),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: EventDetailSheet(item: item),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify negative reaction section header and badge
+    expect(find.text('EVALUACIÓN Y REACCIÓN OBSERVADA'), findsOneWidget);
+    expect(find.text('Respuesta: Negativa'), findsOneWidget);
+
+    // Verify symptom chips are displayed under their section
+    expect(find.text('Síntomas manifestados por el cultivo:'), findsOneWidget);
+    expect(find.text('Hoja quemada'), findsOneWidget);
+    expect(find.text('Marchitez'), findsOneWidget);
+
+    // Verify phytotoxicity notes are displayed in legible container matching reaction notes
+    expect(find.text('Detalle o notas de fitotoxicidad:'), findsOneWidget);
+    expect(find.text('Quemazón severa por deriva de viento en bordes.'), findsOneWidget);
+
+    // Verify reaction notes are also displayed in their separate container
+    expect(find.text('Descripción detallada de la reacción:'), findsOneWidget);
+    expect(find.text('Se aisló el surco afectado con riego de lavado.'), findsOneWidget);
+
+    // Verify Actualizar evaluación button exists
+    expect(find.text('Actualizar evaluación'), findsOneWidget);
+  });
+
   testWidgets('CycleDetailView opens EventDetailSheet on tapping ver detalle', (tester) async {
     await tester.pumpWidget(
       MultiProvider(
@@ -755,6 +817,242 @@ void main() {
     expect(find.text('Bitácora: Tomate Pólder'), findsOneWidget);
     expect(find.text('Aporque y deshierbe de callejón'), findsOneWidget);
   });
+
+  testWidgets('CostSummaryView opens ExpenseDetailSheet and SaleDetailSheet with full notes when tapping cards', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final mockCostRepo = _RichCostRepo();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<CostRepository>(create: (_) => mockCostRepo),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const CostSummaryView(cycleId: 1, cropTitle: 'Tomate'),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify card shows snippet of notes
+    await tester.ensureVisible(find.text('Factura #9872 con 15% descuento por pronto pago'));
+    expect(find.text('Factura #9872 con 15% descuento por pronto pago'), findsOneWidget);
+
+    // Tap on expense card to open ExpenseDetailSheet
+    await tester.tap(find.text('Compra de fertilizante Urea al por mayor para todo el lote'));
+    await tester.pumpAndSettle();
+
+    // Verify ExpenseDetailSheet is displayed
+    expect(find.byType(ExpenseDetailSheet), findsOneWidget);
+    expect(find.text('Detalle del gasto'), findsOneWidget);
+    expect(find.text('Notas del gasto:'), findsOneWidget);
+    expect(find.text('Factura #9872 con 15% descuento por pronto pago'), findsWidgets);
+
+    // Close the sheet
+    await tester.tap(find.byTooltip('Cerrar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ExpenseDetailSheet), findsNothing);
+
+    // Switch to Ventas tab
+    await tester.ensureVisible(find.text('Ventas (1)'));
+    await tester.tap(find.text('Ventas (1)'));
+    await tester.pumpAndSettle();
+
+    // Verify sale card shows snippet of notes
+    await tester.ensureVisible(find.text('Entregado en bodega principal, saldo restante a 30 días'));
+    expect(find.text('Entregado en bodega principal, saldo restante a 30 días'), findsOneWidget);
+
+    // Tap on sale card to open SaleDetailSheet
+    await tester.tap(find.text('Venta a Distribuidora y Exportadora Agrícola del Norte'));
+    await tester.pumpAndSettle();
+
+    // Verify SaleDetailSheet is displayed
+    expect(find.byType(SaleDetailSheet), findsOneWidget);
+    expect(find.text('Detalle de la venta'), findsOneWidget);
+    expect(find.text('Notas de la venta:'), findsOneWidget);
+    expect(find.text('Entregado en bodega principal, saldo restante a 30 días'), findsWidgets);
+
+    // Close the sheet
+    await tester.tap(find.byTooltip('Cerrar'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SaleDetailSheet), findsNothing);
+  });
+
+  testWidgets('PlotDetailView shows copy coordinates button when coordinates are present and copies to clipboard', (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    String? copiedClipboardText;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall methodCall) async {
+        if (methodCall.method == 'Clipboard.setData') {
+          copiedClipboardText = (methodCall.arguments as Map)['text'] as String?;
+          return null;
+        }
+        return null;
+      },
+    );
+    addTearDown(() {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      );
+    });
+
+    final plotWithCoords = Plot(
+      id: 10,
+      name: 'Lote Las Colinas',
+      area: 3.5,
+      areaUnit: AreaUnit.manzanas,
+      latitude: 14.08180,
+      longitude: -87.20680,
+      soilTexture: SoilTexture.franco,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    final mockPlotRepo = _FakeSinglePlotRepo(plotWithCoords);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<PlotRepository>(create: (_) => mockPlotRepo),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const PlotDetailView(plotId: 10),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify plot information is displayed
+    expect(find.text('Lote Las Colinas'), findsOneWidget);
+    expect(find.text('14.08180, -87.20680'), findsOneWidget);
+
+    // Verify copy button is present
+    final copyBtn = find.byTooltip('Copiar coordenadas');
+    expect(copyBtn, findsOneWidget);
+
+    // Tap the copy button
+    await tester.tap(copyBtn);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Verify clipboard content and toast message
+    expect(copiedClipboardText, '14.08180, -87.20680');
+    expect(find.text('Coordenadas copiadas al portapapeles'), findsOneWidget);
+
+    // Dismiss toast
+    await tester.pump(const Duration(seconds: 4));
+  });
+
+  testWidgets('PlotDetailView does not show copy button when plot has no coordinates', (tester) async {
+    final plotWithoutCoords = Plot(
+      id: 20,
+      name: 'Lote Sin GPS',
+      area: 1.0,
+      areaUnit: AreaUnit.manzanas,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    final mockPlotRepo = _FakeSinglePlotRepo(plotWithoutCoords);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<PlotRepository>(create: (_) => mockPlotRepo),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const PlotDetailView(plotId: 20),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lote Sin GPS'), findsOneWidget);
+    expect(find.byTooltip('Copiar coordenadas'), findsNothing);
+  });
+
+  testWidgets('CycleDetailView renders density and distancing notes when present', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final cycleWithNotes = CropCycle(
+      id: 99,
+      plotId: 1,
+      crop: 'Maíz',
+      variety: 'HB-104',
+      plantingDate: DateTime.now().subtract(const Duration(days: 15)),
+      stage: CropStage.growth,
+      densityValue: 30,
+      densityUnit: DensityUnit.libras,
+      densityNotes: '0.80 m entre surcos, 0.20 m entre plantas, 2 semillas por postura',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      plotName: 'Lote La Vega',
+    );
+
+    final mockCycleRepo = _FakeSingleCycleRepo(cycleWithNotes);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<CycleRepository>(create: (_) => mockCycleRepo),
+          Provider<HistoryRepository>(create: (_) => FakeHistoryRepo()),
+          Provider<DataChanges>(create: (_) => DataChanges()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const CycleDetailView(cycleId: 99),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    // Verify title and plot
+    expect(find.text('Maíz HB-104'), findsOneWidget);
+    expect(find.text('Lote: Lote La Vega'), findsOneWidget);
+
+    // Verify density quantity
+    expect(find.text('Densidad de siembra'), findsOneWidget);
+    expect(find.text('30 Libras de semilla'), findsOneWidget);
+
+    // Verify distancing and planting notes
+    expect(find.text('Notas de distanciamiento o siembra'), findsOneWidget);
+    expect(
+      find.text('0.80 m entre surcos, 0.20 m entre plantas, 2 semillas por postura'),
+      findsOneWidget,
+    );
+  });
+}
+
+class _FakeSingleCycleRepo extends FakeCycleRepo {
+  _FakeSingleCycleRepo(this._cycle);
+  final CropCycle _cycle;
+
+  @override
+  Future<CropCycle?> getById(int id) async => _cycle;
 }
 
 class _RichCostRepo implements CostRepository {
@@ -782,6 +1080,7 @@ class _RichCostRepo implements CostRepository {
           date: DateTime.now(),
           createdAt: DateTime.now(),
           cropTitle: 'Tomate',
+          notes: 'Factura #9872 con 15% descuento por pronto pago',
         ),
       ];
 
@@ -797,8 +1096,17 @@ class _RichCostRepo implements CostRepository {
           date: DateTime.now(),
           createdAt: DateTime.now(),
           cropTitle: 'Tomate',
+          notes: 'Entregado en bodega principal, saldo restante a 30 días',
         ),
       ];
+}
+
+class _FakeSinglePlotRepo extends FakePlotRepo {
+  _FakeSinglePlotRepo(this._plot);
+  final Plot _plot;
+
+  @override
+  Future<Plot?> getById(int id) async => _plot;
 }
 
 class _SingleEventHistoryRepo extends FakeHistoryRepo {

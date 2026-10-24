@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/database/data_changes.dart';
@@ -206,6 +207,24 @@ class _PlotDetailContent extends StatelessWidget {
                             value:
                                 '${plot.latitude!.toStringAsFixed(5)}, ${plot.longitude!.toStringAsFixed(5)}',
                             icon: AppIcons.location,
+                            trailing: IconButton(
+                              icon: const Icon(
+                                AppIcons.copy,
+                                size: AppSize.iconSm,
+                              ),
+                              tooltip: 'Copiar coordenadas',
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () {
+                                final coords =
+                                    '${plot.latitude!.toStringAsFixed(5)}, ${plot.longitude!.toStringAsFixed(5)}';
+                                Clipboard.setData(ClipboardData(text: coords));
+                                HapticFeedback.lightImpact();
+                                AppToast.success(
+                                  context,
+                                  'Coordenadas copiadas al portapapeles',
+                                );
+                              },
+                            ),
                           ),
                         ],
                         if (plot.previousCrops != null &&

@@ -230,13 +230,27 @@ class _CycleDetailContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (cycle.densityDisplay.isNotEmpty) ...[
+                  if (cycle.hasDensity || cycle.hasDensityNotes) ...[
                     const SizedBox(height: AppSpace.md),
                     AppCard(
-                      child: InfoLine(
-                        label: 'Densidad de siembra',
-                        value: cycle.densityDisplay,
-                        icon: AppIcons.grains,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          if (cycle.hasDensity)
+                            InfoLine(
+                              label: 'Densidad de siembra',
+                              value: cycle.densityQuantityDisplay,
+                              icon: cycle.densityUnit?.icon ?? AppIcons.grains,
+                            ),
+                          if (cycle.hasDensity && cycle.hasDensityNotes)
+                            const Divider(),
+                          if (cycle.hasDensityNotes)
+                            InfoLine(
+                              label: 'Notas de distanciamiento o siembra',
+                              value: cycle.densityNotes!,
+                              icon: AppIcons.ruler,
+                            ),
+                        ],
                       ),
                     ),
                   ],

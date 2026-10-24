@@ -115,9 +115,19 @@ class ExportService {
                       'Estado actual: ${cycle.stage.label}',
                       style: const pw.TextStyle(fontSize: 11),
                     ),
-                    if (cycle.densityDisplay.isNotEmpty)
+                    if (cycle.hasDensity)
+                      pw.Text(
+                        'Densidad: ${cycle.densityQuantityDisplay}',
+                        style: const pw.TextStyle(fontSize: 11),
+                      )
+                    else if (cycle.densityDisplay.isNotEmpty)
                       pw.Text(
                         'Densidad: ${cycle.densityDisplay}',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    if (cycle.hasDensityNotes && cycle.hasDensity)
+                      pw.Text(
+                        'Distanciamiento: ${cycle.densityNotes}',
                         style: const pw.TextStyle(fontSize: 11),
                       ),
                     if (cycle.yieldDisplay.isNotEmpty)

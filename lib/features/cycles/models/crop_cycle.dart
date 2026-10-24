@@ -181,6 +181,18 @@ class CropCycle {
     CropStage.done => 1.0,
   };
 
+  bool get hasDensity => densityValue != null;
+
+  bool get hasDensityNotes =>
+      densityNotes != null && densityNotes!.trim().isNotEmpty;
+
+  String get densityQuantityDisplay {
+    if (densityValue == null) return '';
+    final val = Formatters.editable(densityValue);
+    final unitLabel = densityUnit?.label;
+    return unitLabel != null && unitLabel.isNotEmpty ? '$val $unitLabel' : val;
+  }
+
   String get densityDisplay {
     if (densityValue == null) return densityNotes ?? '';
     final val = Formatters.editable(densityValue);

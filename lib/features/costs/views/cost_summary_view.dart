@@ -19,6 +19,7 @@ import '../../../core/widgets/metric_card.dart';
 import '../controllers/cost_controllers.dart';
 import '../data/cost_repository.dart';
 import '../models/cost_models.dart';
+import 'cost_detail_sheet.dart';
 import 'expense_form_view.dart';
 import 'sale_form_view.dart';
 
@@ -235,6 +236,23 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: AppSpace.sm),
                           child: AppCard(
+                            onTap: () => ExpenseDetailSheet.show(
+                              context,
+                              expense: expense,
+                              onDelete: () => _confirmDeleteExpense(
+                                context,
+                                controller,
+                                expense,
+                              ),
+                              onEdit: () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => ExpenseFormView(
+                                    expenseToEdit: expense,
+                                    initialCycleId: widget.cycleId,
+                                  ),
+                                ),
+                              ),
+                            ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -260,6 +278,30 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                                         Text(
                                           '${Formatters.editable(expense.quantity)} un. × ${Formatters.money(expense.unitPrice!)}',
                                           style: t.caption,
+                                        ),
+                                      ],
+                                      if (expense.notes != null &&
+                                          expense.notes!.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              AppIcons.note,
+                                              size: 13,
+                                              color: c.inkMuted,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                expense.notes!,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: t.caption.copyWith(
+                                                  color: c.inkMuted,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ],
@@ -317,6 +359,23 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: AppSpace.sm),
                           child: AppCard(
+                            onTap: () => SaleDetailSheet.show(
+                              context,
+                              sale: sale,
+                              onDelete: () => _confirmDeleteSale(
+                                context,
+                                controller,
+                                sale,
+                              ),
+                              onEdit: () => Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => SaleFormView(
+                                    saleToEdit: sale,
+                                    initialCycleId: widget.cycleId,
+                                  ),
+                                ),
+                              ),
+                            ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -347,6 +406,30 @@ class _CostSummaryContentState extends State<_CostSummaryContent> {
                                         Text(
                                           '${Formatters.editable(sale.quantity)} ${sale.unit ?? ''}',
                                           style: t.caption,
+                                        ),
+                                      ],
+                                      if (sale.notes != null &&
+                                          sale.notes!.trim().isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              AppIcons.note,
+                                              size: 13,
+                                              color: c.inkMuted,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(
+                                                sale.notes!,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: t.caption.copyWith(
+                                                  color: c.inkMuted,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ],

@@ -11,6 +11,10 @@ import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
 import 'package:tierra_y_hoja/features/field_log/models/input_application.dart';
 import 'package:tierra_y_hoja/features/history/data/history_repository.dart';
 import 'package:tierra_y_hoja/features/history/models/experience_models.dart';
+import 'package:tierra_y_hoja/core/services/photo_storage_service.dart';
+import 'package:tierra_y_hoja/core/services/reminder_service.dart';
+import 'package:tierra_y_hoja/features/field_log/controllers/application_controllers.dart';
+import 'package:tierra_y_hoja/features/field_log/data/application_repository.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
 import 'package:tierra_y_hoja/features/tour/models/tour_step_data.dart';
 
@@ -316,6 +320,182 @@ void main() {
       expect(controller.filteredEvents.length, 3);
     });
   });
+
+  group('SymptomsData & Phytotoxicity Notes Logic', () {
+    test('SymptomsData handles null, empty and whitespace strings', () {
+      final parsedNull = SymptomsData.parse(null);
+      expect(parsedNull.hasChips, isFalse);
+      expect(parsedNull.hasNotes, isFalse);
+      expect(parsedNull.isEmpty, isTrue);
+
+      final parsedEmpty = SymptomsData.parse('');
+      expect(parsedEmpty.isEmpty, isTrue);
+
+      final parsedSpaces = SymptomsData.parse('   ');
+      expect(parsedSpaces.isEmpty, isTrue);
+
+      expect(SymptomsData.format({}, null), isNull);
+      expect(SymptomsData.format({}, ''), isNull);
+    });
+
+    test('SymptomsData formats and parses structured chips only', () {
+      final chips = {'Hoja quemada', 'Marchitez'};
+      final formatted = SymptomsData.format(chips, null);
+      expect(formatted, 'Hoja quemada, Marchitez');
+
+      final parsed = SymptomsData.parse(formatted);
+      expect(parsed.chips, equals(chips));
+      expect(parsed.hasChips, isTrue);
+      expect(parsed.hasNotes, isFalse);
+      expect(parsed.notes, isNull);
+    });
+
+    test('SymptomsData formats and parses structured notes only', () {
+      const notes = 'Bordes necrosados por aplicación al mediodía con sol fuerte.';
+      final formatted = SymptomsData.format({}, notes);
+      expect(formatted, contains(notes));
+
+      final parsed = SymptomsData.parse(formatted);
+      expect(parsed.hasChips, isFalse);
+      expect(parsed.hasNotes, isTrue);
+      expect(parsed.notes, notes);
+    });
+
+    test('SymptomsData formats and parses chips with detailed notes including commas and newlines', () {
+      final chips = {'Hoja quemada', 'Amarillamiento'};
+      const notes = 'Se quemaron las hojas más tiernas, especialmente brotes.\nRevisado a los 2 días.';
+      final formatted = SymptomsData.format(chips, notes);
+      expect(formatted, isNotNull);
+
+      final parsed = SymptomsData.parse(formatted);
+      expect(parsed.chips, equals(chips));
+      expect(parsed.hasChips, isTrue);
+      expect(parsed.hasNotes, isTrue);
+      expect(parsed.notes, notes);
+    });
+
+    test('SymptomsData backward compatibility parses legacy comma-joined strings', () {
+      // Caso 1: chips estándar históricos + notas libres con comas
+      const legacy = 'Hoja quemada, Amarillamiento, Se quemaron las hojas, brotes secos';
+      final parsed = SymptomsData.parse(legacy);
+
+      expect(parsed.chips, contains('Hoja quemada'));
+      expect(parsed.chips, contains('Amarillamiento'));
+      expect(parsed.hasNotes, isTrue);
+      expect(parsed.notes, 'Se quemaron las hojas, brotes secos');
+
+      // Caso 2: solo notas libres sin chips
+      const legacyNotesOnly = 'Las hojas se marchitaron al sol';
+      final parsedNotesOnly = SymptomsData.parse(legacyNotesOnly);
+      expect(parsedNotesOnly.hasChips, isFalse);
+      expect(parsedNotesOnly.hasNotes, isTrue);
+      expect(parsedNotesOnly.notes, 'Las hojas se marchitaron al sol');
+    });
+
+    test('InputApplication and UnifiedTimelineItem expose parsedSymptoms getter', () {
+      final now = DateTime.now();
+      final app = InputApplication(
+        cycleId: 1,
+        inputType: InputType.foliar,
+        productName: 'Foliar Cobre',
+        appliedAt: now,
+        verdict: ReactionVerdict.negative,
+        symptoms: 'Hoja quemada\n\nDetalle de fitotoxicidad:\nQuemazón en ápice foliar',
+        createdAt: now,
+      );
+
+      expect(app.parsedSymptoms.hasChips, isTrue);
+      expect(app.parsedSymptoms.chips, contains('Hoja quemada'));
+      expect(app.parsedSymptoms.hasNotes, isTrue);
+      expect(app.parsedSymptoms.notes, 'Quemazón en ápice foliar');
+
+      final timelineItem = UnifiedTimelineItem(
+        id: 1,
+        type: TimelineEventType.insumo,
+        cycleId: 1,
+        title: 'Foliar Cobre',
+        date: now,
+        application: app,
+      );
+
+      expect(timelineItem.parsedSymptoms.notes, 'Quemazón en ápice foliar');
+    });
+
+    test('FollowUpFormController initializes with pre-populated phytotoxicity notes and chips for updating evaluation', () {
+      final now = DateTime.now();
+      final app = InputApplication(
+        id: 1,
+        cycleId: 1,
+        inputType: InputType.foliar,
+        productName: 'Producto Test',
+        appliedAt: now,
+        verdict: ReactionVerdict.negative,
+        symptoms: SymptomsData.format({'Hoja quemada'}, 'Puntas quemadas por sobrefertilización'),
+        reactionNotes: 'Se lavó el follaje',
+        createdAt: now,
+      );
+
+      final controller = FollowUpFormController(
+        app,
+        _FakeAppRepoForTest(),
+        _FakePhotoServiceForTest(),
+        _FakeReminderServiceForTest(),
+      );
+
+      // Verify data is populated and not blank
+      expect(controller.selectedVerdict, ReactionVerdict.negative);
+      expect(controller.selectedSymptoms, contains('Hoja quemada'));
+      expect(controller.symptomsDetailsController.text, 'Puntas quemadas por sobrefertilización');
+      expect(controller.reactionNotesController.text, 'Se lavó el follaje');
+    });
+  });
+
+  group('CropCycle Density & Distancing Notes Logic', () {
+    test('hasDensity, hasDensityNotes and densityQuantityDisplay work as expected', () {
+      final cycleBoth = CropCycle(
+        id: 1,
+        plotId: 1,
+        crop: 'Maíz',
+        plantingDate: DateTime.now(),
+        densityValue: 25,
+        densityUnit: DensityUnit.libras,
+        densityNotes: '0.80 m entre surcos',
+        stage: CropStage.growth,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      expect(cycleBoth.hasDensity, isTrue);
+      expect(cycleBoth.hasDensityNotes, isTrue);
+      expect(cycleBoth.densityQuantityDisplay, '25 Libras de semilla');
+
+      final cycleNotesOnly = CropCycle(
+        id: 2,
+        plotId: 1,
+        crop: 'Frijol',
+        plantingDate: DateTime.now(),
+        densityNotes: '2 semillas por postura cada 15 cm',
+        stage: CropStage.growth,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      expect(cycleNotesOnly.hasDensity, isFalse);
+      expect(cycleNotesOnly.hasDensityNotes, isTrue);
+      expect(cycleNotesOnly.densityQuantityDisplay, '');
+
+      final cycleNone = CropCycle(
+        id: 3,
+        plotId: 1,
+        crop: 'Café',
+        plantingDate: DateTime.now(),
+        stage: CropStage.growth,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      expect(cycleNone.hasDensity, isFalse);
+      expect(cycleNone.hasDensityNotes, isFalse);
+      expect(cycleNone.densityQuantityDisplay, '');
+    });
+  });
 }
 
 class _FakeCycleRepoForTest implements CycleRepository {
@@ -335,5 +515,20 @@ class _FakeHistoryRepoForTest implements HistoryRepository {
 
   @override
   Future<List<UnifiedTimelineItem>> getTimelineForCycle(int cycleId) async => [];
+}
+
+class _FakeAppRepoForTest implements ApplicationRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakePhotoServiceForTest implements PhotoStorageService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _FakeReminderServiceForTest implements ReminderService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 

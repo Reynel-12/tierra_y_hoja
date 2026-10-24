@@ -76,6 +76,10 @@ class UnifiedTimelineItem {
   bool get hasPhotos =>
       (photoBefore != null && photoBefore!.trim().isNotEmpty) ||
       (photoAfter != null && photoAfter!.trim().isNotEmpty);
+
+  /// Desglosa los síntomas registrados en chips estándar y notas de fitotoxicidad.
+  SymptomsData get parsedSymptoms =>
+      application?.parsedSymptoms ?? const SymptomsData();
 }
 
 /// Resultado paginado genérico para consultas de historial y memoria.
@@ -188,6 +192,10 @@ class LearningResult {
     TimelineEventType.cosecha => c.positive,
     _ => c.primary,
   };
+
+  /// Desglosa los síntomas registrados en chips estándar y notas de fitotoxicidad.
+  SymptomsData get parsedSymptoms =>
+      application?.parsedSymptoms ?? SymptomsData.parse(symptoms);
 
   /// Convierte este resultado de memoria en un [UnifiedTimelineItem] completo
   /// para reusar el visualizador de eventos y modales de detalle.

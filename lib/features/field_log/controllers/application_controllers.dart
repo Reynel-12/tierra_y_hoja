@@ -242,14 +242,13 @@ class FollowUpFormController extends FormController {
   ) {
     _photoTracker = PhotoTracker(_photoService);
     reactionNotesController = text(application.reactionNotes ?? '');
-    symptomsDetailsController = text('');
+
+    final symptomsData = application.parsedSymptoms;
+    symptomsDetailsController = text(symptomsData.notes ?? '');
+    selectedSymptoms = {...symptomsData.chips};
 
     selectedVerdict = application.verdict ?? ReactionVerdict.positive;
     photoAfter = application.photoAfter;
-
-    if (application.symptoms != null && application.symptoms!.isNotEmpty) {
-      selectedSymptoms = application.symptoms!.split(', ').toSet();
-    }
 
     markReady();
   }
@@ -284,10 +283,12 @@ class FollowUpFormController extends FormController {
       return const SaveFailure('Por favor elija un veredicto de reacción.');
     }
 
-    final symptomsList = selectedSymptoms.toList();
-    if (symptomsDetailsController.text.trim().isNotEmpty) {
-      symptomsList.add(symptomsDetailsController.text.trim());
-    }
+    final formattedSymptoms = selectedVerdict == ReactionVerdict.negative
+        ? SymptomsData.format(
+            selectedSymptoms,
+            symptomsDetailsController.text,
+          )
+        : null;
 
     await _repository.updateReaction(
       id: application.id!,
@@ -295,7 +296,7 @@ class FollowUpFormController extends FormController {
       reactionNotes: reactionNotesController.text.trim().isEmpty
           ? null
           : reactionNotesController.text.trim(),
-      symptoms: symptomsList.isEmpty ? null : symptomsList.join(', '),
+      symptoms: formattedSymptoms,
       photoAfter: photoAfter,
     );
 

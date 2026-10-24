@@ -436,6 +436,7 @@ class EventDetailSheet extends StatelessWidget {
     if (app.hasReviewed) {
       final verdict = app.verdict!;
       final verdictColor = verdict.color(c);
+      final symptomsData = app.parsedSymptoms;
 
       return Container(
         padding: const EdgeInsets.all(AppSpace.md),
@@ -482,17 +483,14 @@ class EventDetailSheet extends StatelessWidget {
             ],
 
             // Síntomas observados
-            if (app.symptoms != null && app.symptoms!.isNotEmpty) ...[
+            if (symptomsData.hasChips) ...[
               const SizedBox(height: AppSpace.md),
               Text('Síntomas manifestados por el cultivo:', style: t.label),
               const SizedBox(height: AppSpace.xs),
               Wrap(
                 spacing: AppSpace.xs,
                 runSpacing: AppSpace.xs,
-                children: app.symptoms!
-                    .split(',')
-                    .map((s) => s.trim())
-                    .where((s) => s.isNotEmpty)
+                children: symptomsData.chips
                     .map(
                       (symptom) => Container(
                         padding: const EdgeInsets.symmetric(
@@ -508,6 +506,23 @@ class EventDetailSheet extends StatelessWidget {
                       ),
                     )
                     .toList(),
+              ),
+            ],
+
+            // Detalle o notas de fitotoxicidad
+            if (symptomsData.hasNotes) ...[
+              const SizedBox(height: AppSpace.md),
+              Text('Detalle o notas de fitotoxicidad:', style: t.label),
+              const SizedBox(height: AppSpace.xs),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpace.sm),
+                decoration: BoxDecoration(
+                  color: c.surface,
+                  borderRadius: AppRadius.control,
+                  border: Border.all(color: c.outline),
+                ),
+                child: Text(symptomsData.notes!, style: t.bodySm),
               ),
             ],
 
