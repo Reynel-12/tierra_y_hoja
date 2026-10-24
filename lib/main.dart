@@ -17,6 +17,8 @@ import 'features/cycles/data/cycle_repository.dart';
 import 'features/field_log/data/application_repository.dart';
 import 'features/history/data/history_repository.dart';
 import 'features/plots/data/plot_repository.dart';
+import 'features/tour/controllers/guided_tour_controller.dart';
+import 'features/tour/views/guided_tour_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,6 +43,10 @@ void main() async {
   final costRepo = CostRepository(database);
   final historyRepo = HistoryRepository(database);
 
+  // 5. Controlador de Tour Guiado (validación de primera vez)
+  final tourController = GuidedTourController(database);
+  await tourController.init();
+
   runApp(
     MultiProvider(
       providers: [
@@ -57,6 +63,7 @@ void main() async {
         Provider<CostRepository>.value(value: costRepo),
         Provider<HistoryRepository>.value(value: historyRepo),
         ChangeNotifierProvider(create: (_) => ThemeController(database)),
+        ChangeNotifierProvider<GuidedTourController>.value(value: tourController),
       ],
       child: const TierraYHojaApp(),
     ),
@@ -69,6 +76,7 @@ class TierraYHojaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController = context.watch<ThemeController>();
+    final tourController = context.watch<GuidedTourController>();
 
     return MaterialApp(
       title: 'Tierra & Hoja',
@@ -85,7 +93,9 @@ class TierraYHojaApp extends StatelessWidget {
         Locale('es', 'HN'),
         Locale('es', ''),
       ],
-      home: const AppShell(),
+      home: !tourController.isLoaded
+          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+          : (tourController.isCompleted ? const AppShell() : const GuidedTourView(isRevisit: false)),
     );
   }
 }

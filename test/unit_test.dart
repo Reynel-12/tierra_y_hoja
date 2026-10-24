@@ -4,6 +4,7 @@ import 'package:tierra_y_hoja/core/utils/validators.dart';
 import 'package:tierra_y_hoja/features/costs/models/cost_models.dart';
 import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
+import 'package:tierra_y_hoja/features/tour/models/tour_step_data.dart';
 
 void main() {
   group('Formatters & Design System', () {
@@ -89,6 +90,40 @@ void main() {
       expect(cycle.title, 'Maíz H-59');
       expect(cycle.estimatedProgress, 0.40);
       expect(cycle.isClosed, isFalse);
+    });
+  });
+
+  group('Guided Tour Order and Structure', () {
+    test('contains exactly 9 steps in authentic agricultural workflow order', () {
+      expect(TourStepData.steps.length, 9);
+
+      // Verify strict agricultural order: Lote -> Siembra -> Insumo -> Veredicto -> Labor/Plaga -> Costos -> Cosecha -> Memoria -> Inicio
+      expect(TourStepData.steps[0].shortName, '1. Lotes');
+      expect(TourStepData.steps[1].shortName, '2. Siembras');
+      expect(TourStepData.steps[2].shortName, '3. Insumos');
+      expect(TourStepData.steps[3].shortName, '4. Veredicto');
+      expect(TourStepData.steps[4].shortName, '5. Labores y Plagas');
+      expect(TourStepData.steps[5].shortName, '6. Finanzas');
+      expect(TourStepData.steps[6].shortName, '7. Cosecha');
+      expect(TourStepData.steps[7].shortName, '8. Memoria');
+      expect(TourStepData.steps[8].shortName, '9. Inicio y FAB');
+    });
+
+    test('each step has comprehensive field explanations and tips', () {
+      for (final step in TourStepData.steps) {
+        expect(step.title.isNotEmpty, isTrue);
+        expect(step.whyOrder.isNotEmpty, isTrue);
+        expect(step.appLocation.isNotEmpty, isTrue);
+        expect(step.screenPurpose.isNotEmpty, isTrue);
+        expect(step.inputsSummary.isNotEmpty, isTrue);
+        expect(step.agriculturalTip.isNotEmpty, isTrue);
+
+        for (final input in step.inputsSummary) {
+          expect(input.name.isNotEmpty, isTrue);
+          expect(input.dataType.isNotEmpty, isTrue);
+          expect(input.description.isNotEmpty, isTrue);
+        }
+      }
     });
   });
 }

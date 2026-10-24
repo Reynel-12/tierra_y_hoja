@@ -12,6 +12,8 @@ import 'package:tierra_y_hoja/features/cycles/models/crop_cycle.dart';
 import 'package:tierra_y_hoja/features/cycles/views/cycle_form_view.dart';
 import 'package:tierra_y_hoja/features/plots/data/plot_repository.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
+import 'package:tierra_y_hoja/features/tour/controllers/guided_tour_controller.dart';
+import 'package:tierra_y_hoja/features/tour/views/guided_tour_view.dart';
 
 class FakeCostRepo implements CostRepository {
   @override
@@ -132,5 +134,84 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ver cuentas'), findsOneWidget);
     expect(find.text('Detalle'), findsOneWidget);
+  });
+
+  testWidgets('GuidedTourView renders step 1 and advances to step 2 correctly', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    final tourController = GuidedTourController();
+    await tourController.init();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<GuidedTourController>.value(
+        value: tourController,
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const GuidedTourView(isRevisit: false),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify Step 1 is rendered
+    expect(find.text('Paso 1 de 9'), findsOneWidget);
+    expect(find.text('Módulo de Parcelas y Lotes'), findsOneWidget);
+    expect(find.text('¿Por qué en este orden?'), findsOneWidget);
+    expect(find.text('¿Dónde se ubica en la aplicación?'), findsOneWidget);
+    expect(find.text('Probar: Guardar lote de ejemplo'), findsOneWidget);
+
+    // Tap on next step button
+    await tester.tap(find.textContaining('Siguiente:'));
+    await tester.pumpAndSettle();
+
+    // Verify Step 2 is now shown
+    expect(find.text('Paso 2 de 9'), findsOneWidget);
+    expect(find.text('Módulo de Ciclos de Siembra'), findsOneWidget);
+    expect(find.text('Probar: Abrir ciclo de siembra'), findsOneWidget);
+  });
+
+  testWidgets('GuidedTourView allows jumping directly to Step 9 and testing demo actions', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    final tourController = GuidedTourController();
+    await tourController.init();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<GuidedTourController>.value(
+        value: tourController,
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const GuidedTourView(isRevisit: false),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Jump directly to Step 9 using controller
+    tourController.goToStep(8);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Paso 9 de 9'), findsOneWidget);
+    expect(find.text('Pantalla de Inicio y Acceso Rápido'), findsOneWidget);
+    // Test a simulated demo FAB action
+    await tester.ensureVisible(find.text('🧪 Insumo'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('🧪 Insumo'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.textContaining('Acceso directo a: Registrar Insumo.'), findsOneWidget);
+
+    // Wait for demo SnackBar to dismiss
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
+    // Finish the tour
+    await tester.tap(find.text('¡Comenzar a registrar!'));
+    await tester.pumpAndSettle();
+    expect(tourController.isCompleted, isTrue);
   });
 }

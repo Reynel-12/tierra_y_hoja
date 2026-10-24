@@ -14,6 +14,7 @@ import '../../../core/widgets/layout.dart';
 import '../../costs/views/cost_summary_view.dart';
 import '../../history/views/cycle_comparison_view.dart';
 import '../../history/views/experience_search_view.dart';
+import '../../tour/views/guided_tour_view.dart';
 
 /// Pantilla B / Configuración: Menú de Más Opciones y Preferencias.
 class MoreView extends StatelessWidget {
@@ -84,6 +85,26 @@ class MoreView extends StatelessWidget {
               ),
               const SizedBox(height: AppSpace.section),
 
+              // Guía y Aprendizaje
+              const SectionHeader(title: 'Guía y Aprendizaje'),
+              AppCard(
+                child: Column(
+                  children: [
+                    ListRow(
+                      icon: AppIcons.book,
+                      title: 'Tour Guiado de la Aplicación',
+                      subtitle: 'Repase el orden correcto de registro y el uso de cada pantalla',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const GuidedTourView(isRevisit: true),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpace.section),
+
               // Apariencia y Tema
               const SectionHeader(title: 'Apariencia visual'),
               AppCard(
@@ -139,7 +160,7 @@ class MoreView extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Tierra & Hoja', style: t.titleSm),
-                              Text('Versión 1.0.0 · Cuaderno de Campo', style: t.caption),
+                              Text('Versión 1.1.0 · Cuaderno de Campo', style: t.caption),
                             ],
                           ),
                         ),
