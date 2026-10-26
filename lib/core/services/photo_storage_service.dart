@@ -98,6 +98,9 @@ class PhotoStorageService {
     }
   }
 
+  /// Carpeta local donde se almacenan las fotografías de la aplicación.
+  Future<Directory> get photosDirectory => _directory();
+
   Future<Directory> _directory() async {
     final cached = _photosDir;
     if (cached != null) return cached;

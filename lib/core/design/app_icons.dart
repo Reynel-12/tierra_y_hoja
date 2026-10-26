@@ -113,4 +113,11 @@ abstract final class AppIcons {
   static const IconData moon = PhosphorIconsRegular.moon;
   static const IconData system = PhosphorIconsRegular.circleHalf;
   static const IconData copy = PhosphorIconsRegular.copy;
+  static const IconData folder = PhosphorIconsRegular.folder;
+  static const IconData folderOpen = PhosphorIconsRegular.folderOpen;
+  static const IconData restore = PhosphorIconsRegular.arrowCounterClockwise;
+  static const IconData archive = PhosphorIconsRegular.archive;
+  static const IconData upload = PhosphorIconsRegular.uploadSimple;
+  static const IconData download = PhosphorIconsRegular.downloadSimple;
 }
+

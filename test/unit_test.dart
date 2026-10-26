@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:tierra_y_hoja/core/database/data_changes.dart';
 import 'package:tierra_y_hoja/core/design/app_colors.dart';
 import 'package:tierra_y_hoja/core/utils/formatters.dart';
@@ -19,6 +20,9 @@ import 'package:tierra_y_hoja/features/plots/models/plot.dart';
 import 'package:tierra_y_hoja/features/tour/models/tour_step_data.dart';
 
 void main() {
+  setUpAll(() async {
+    await initializeDateFormatting('es', null);
+  });
   group('Formatters & Design System', () {
     test('Formatters.money formats Honduran Lempira with L and 2 decimals', () {
       expect(Formatters.money(0), 'L 0.00');
@@ -106,10 +110,10 @@ void main() {
   });
 
   group('Guided Tour Order and Structure', () {
-    test('contains exactly 9 steps in authentic agricultural workflow order', () {
-      expect(TourStepData.steps.length, 9);
+    test('contains exactly 10 steps in authentic agricultural workflow order', () {
+      expect(TourStepData.steps.length, 10);
 
-      // Verify strict agricultural order: Lote -> Siembra -> Insumo -> Veredicto -> Labor/Plaga -> Costos -> Cosecha -> Memoria -> Inicio
+      // Verify strict agricultural order: Lote -> Siembra -> Insumo -> Veredicto -> Labor/Plaga -> Costos -> Cosecha -> Memoria -> Copias -> Inicio
       expect(TourStepData.steps[0].shortName, '1. Lotes');
       expect(TourStepData.steps[1].shortName, '2. Siembras');
       expect(TourStepData.steps[2].shortName, '3. Insumos');
@@ -118,7 +122,8 @@ void main() {
       expect(TourStepData.steps[5].shortName, '6. Finanzas');
       expect(TourStepData.steps[6].shortName, '7. Cosecha');
       expect(TourStepData.steps[7].shortName, '8. Memoria');
-      expect(TourStepData.steps[8].shortName, '9. Inicio y FAB');
+      expect(TourStepData.steps[8].shortName, '9. Copias');
+      expect(TourStepData.steps[9].shortName, '10. Inicio y FAB');
     });
 
     test('each step has comprehensive field explanations and tips', () {
@@ -496,11 +501,137 @@ void main() {
       expect(cycleNone.densityQuantityDisplay, '');
     });
   });
+
+  group('ReminderOption & Notifications Logic', () {
+    // test('ReminderOption includes tenSeconds with correct label', () {
+    //   expect(ReminderOption.tenSeconds.label, '10 segundos');
+    //   expect(ReminderOption.values.first, ReminderOption.tenSeconds);
+    // });
+
+    // test('ApplicationFormController selects tenSeconds when diff is within 60s', () {
+    //   final now = DateTime.now();
+    //   final appWith10s = InputApplication(
+    //     id: 1,
+    //     cycleId: 1,
+    //     inputType: InputType.fertilizanteGranular,
+    //     productName: 'Urea',
+    //     appliedAt: now,
+    //     reviewDueAt: now.add(const Duration(seconds: 10)),
+    //     createdAt: now,
+    //   );
+    //
+    //   final controller = ApplicationFormController(
+    //     _FakeAppRepoForTest(),
+    //     _FakeCycleRepoForTest(),
+    //     _FakePhotoServiceForTest(),
+    //     _FakeReminderServiceForTest(),
+    //     initialApp: appWith10s,
+    //   );
+    //
+    //   expect(controller.selectedReminder, ReminderOption.tenSeconds);
+    // });
+
+    test('ApplicationFormController schedules reminder with planting name and application date', () async {
+      final now = DateTime(2026, 10, 25, 8, 30);
+      final cycle = CropCycle(
+        id: 10,
+        plotId: 1,
+        crop: 'Tomate',
+        variety: 'Manzano',
+        plantingDate: DateTime(2026, 10, 1),
+        stage: CropStage.growth,
+        createdAt: now,
+        updatedAt: now,
+      );
+
+      final fakeCycleRepo = _FakeCycleRepoWithData(cycle);
+      final fakeReminderService = _TrackingReminderService();
+      final fakeAppRepo = _FakeAppRepoWithInsert();
+
+      final controller = ApplicationFormController(
+        fakeAppRepo,
+        fakeCycleRepo,
+        _FakePhotoServiceForTest(),
+        fakeReminderService,
+      );
+      await Future<void>.delayed(Duration.zero);
+      controller.selectedCycleId = 10;
+      controller.productNameController.text = 'Sulfato de Cobre';
+      controller.appliedAt = now;
+      controller.selectedReminder = ReminderOption.threeDays;
+
+      await controller.performSave();
+
+      expect(fakeReminderService.lastScheduledTitle, 'Revisión en Tomate Manzano');
+      expect(
+        fakeReminderService.lastScheduledBody,
+        contains('Sulfato de Cobre'),
+      );
+      expect(
+        fakeReminderService.lastScheduledBody,
+        contains('Tomate Manzano'),
+      );
+      expect(
+        fakeReminderService.lastScheduledBody,
+        contains(Formatters.date(now)),
+      );
+      expect(fakeReminderService.lastScheduledPayload, '42');
+    });
+  });
+}
+
+class _TrackingReminderService implements ReminderService {
+  String? lastScheduledTitle;
+  String? lastScheduledBody;
+  String? lastScheduledPayload;
+  DateTime? lastScheduledAt;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<bool> requestPermission() async => true;
+
+  @override
+  Future<void> schedule({
+    required int id,
+    required DateTime at,
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    lastScheduledTitle = title;
+    lastScheduledBody = body;
+    lastScheduledPayload = payload;
+    lastScheduledAt = at;
+  }
+}
+
+class _FakeCycleRepoWithData extends _FakeCycleRepoForTest {
+  _FakeCycleRepoWithData(this.cycle);
+  final CropCycle cycle;
+
+  @override
+  Future<List<CropCycle>> getAll({bool onlyActive = false}) async => [cycle];
+
+  @override
+  Future<CropCycle?> getById(int id) async => id == cycle.id ? cycle : null;
+}
+
+class _FakeAppRepoWithInsert extends _FakeAppRepoForTest {
+  @override
+  Future<int> insert(InputApplication app) async => 42;
+
+  @override
+  Future<int> update(InputApplication app) async => 1;
 }
 
 class _FakeCycleRepoForTest implements CycleRepository {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<List<CropCycle>> getAll({bool onlyActive = false}) async => [];
 
   @override
   Future<CropCycle?> getById(int id) async => null;
@@ -525,6 +656,9 @@ class _FakeAppRepoForTest implements ApplicationRepository {
 class _FakePhotoServiceForTest implements PhotoStorageService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<void> deleteAll(Iterable<String?> paths) async {}
 }
 
 class _FakeReminderServiceForTest implements ReminderService {

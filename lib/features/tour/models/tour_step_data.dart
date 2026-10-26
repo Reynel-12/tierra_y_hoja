@@ -437,16 +437,61 @@ class TourStepData {
     ),
 
     // -------------------------------------------------------------
-    // PASO 9: PANTALLA DE INICIO Y ACCESO RÁPIDO
+    // PASO 9: COPIAS DE SEGURIDAD Y RESPALDO
     // -------------------------------------------------------------
     TourStepData(
       stepNumber: 9,
-      shortName: '9. Inicio y FAB',
+      shortName: '9. Copias',
+      title: 'Copias de Seguridad y Respaldo',
+      tagline: 'Protección de sus Datos · Toda su finca y fotos seguras',
+      icon: AppIcons.database,
+      whyOrder:
+          'Después de registrar sus parcelas, siembras, labores y cosechas, es fundamental proteger todo su esfuerzo. Una copia de seguridad le garantiza que nunca perderá su información si extravía o cambia de teléfono.',
+      appLocation:
+          'Pestaña inferior "Más" ➔ Opción "Copias de Seguridad y Restauración".',
+      screenPurpose:
+          'Guarda todas las notas de su finca y todas las fotografías en un solo archivo protegido. Puede crear copias en cualquier momento, enviarlas por WhatsApp o restaurarlas en un nuevo teléfono.',
+      inputsSummary: [
+        TourInputFieldInfo(
+          name: 'Carpeta de guardado',
+          dataType: 'Carpeta en su teléfono',
+          description:
+              'Lugar donde se guardan sus copias. Se recomienda cambiar la carpeta predeterminada por una fácil de recordar (como "Descargas") para que encuentre sus archivos rápidamente.',
+        ),
+        TourInputFieldInfo(
+          name: 'Crear copia de seguridad',
+          dataType: 'Botón de 1 toque',
+          description:
+              'Empaqueta todas sus siembras, fotos, cuentas y notas en un solo archivo liviano y seguro sin necesidad de internet.',
+        ),
+        TourInputFieldInfo(
+          name: 'Compartir copia por WhatsApp',
+          dataType: 'Envío directo desde el teléfono',
+          description:
+              'Le permite enviar el archivo de su copia a un familiar, a su técnico o guardarlo en su correo para mayor tranquilidad.',
+        ),
+        TourInputFieldInfo(
+          name: 'Restaurar copia de seguridad',
+          dataType: 'Selección de archivo',
+          description:
+              'Si cambia de teléfono, solo elija su archivo de copia y la aplicación recuperará automáticamente todos sus datos y fotografías.',
+        ),
+      ],
+      agriculturalTip:
+          'Recomendación de oro: Cambie la carpeta donde se guardan las copias a "Descargas". Así sabrá exactamente dónde buscar su archivo cuando quiera enviarlo por WhatsApp o guardarlo en una memoria.',
+    ),
+
+    // -------------------------------------------------------------
+    // PASO 10: PANTALLA DE INICIO Y ACCESO RÁPIDO
+    // -------------------------------------------------------------
+    TourStepData(
+      stepNumber: 10,
+      shortName: '10. Inicio y FAB',
       title: 'Pantalla de Inicio y Acceso Rápido',
       tagline: 'Centro de Operaciones Diario · 100% Offline',
       icon: AppIcons.home,
       whyOrder:
-          'Ahora que conoce todo el flujo, la pantalla de Inicio y el botón flotante (+) son las herramientas que usará todos los días.',
+          'Ahora que conoce todo el funcionamiento, la pantalla de Inicio y el botón flotante (+) son las herramientas que usará todos los días en el campo.',
       appLocation:
           'Pestaña inferior "Inicio" y botón flotante verde (+) en la parte inferior de la pantalla.',
       screenPurpose:
@@ -466,9 +511,9 @@ class TourStepData {
         ),
         TourInputFieldInfo(
           name: 'Garantía 100% Offline',
-          dataType: 'Almacenamiento SQLite local',
+          dataType: 'Almacenamiento local seguro',
           description:
-              'La app no necesita señal ni internet. Todo se graba en su teléfono al instante y de forma segura.',
+              'La aplicación no necesita señal ni internet. Todo se graba en su teléfono al instante y de forma segura.',
         ),
       ],
       agriculturalTip:

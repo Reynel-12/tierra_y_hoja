@@ -14,8 +14,9 @@ import '../../cycles/models/crop_cycle.dart';
 import '../data/application_repository.dart';
 import '../models/input_application.dart';
 
-/// Opciones para recordatorio de revisión (§7.4): 3 días, 5 días, 7 días, Sin recordatorio.
+/// Opciones para recordatorio de revisión (§7.4): 10 segundos (prueba), 3 días, 5 días, 7 días, Sin recordatorio.
 enum ReminderOption {
+  // tenSeconds(0, '10 segundos'),
   threeDays(3, '3 días'),
   fiveDays(5, '5 días'),
   sevenDays(7, '7 días'),
@@ -55,9 +56,15 @@ class ApplicationFormController extends FormController {
 
     // Calcular recordatorio
     if (initialApp?.reviewDueAt != null) {
+      // final diffSeconds = initialApp!.reviewDueAt!
+      //     .difference(initialApp!.appliedAt)
+      //     .inSeconds;
       final diff = initialApp!.reviewDueAt!
           .difference(initialApp!.appliedAt)
           .inDays;
+      // if (diffSeconds <= 60) {
+      //   selectedReminder = ReminderOption.tenSeconds;
+      // } else
       if (diff <= 3) {
         selectedReminder = ReminderOption.threeDays;
       } else if (diff <= 5) {
@@ -147,6 +154,9 @@ class ApplicationFormController extends FormController {
 
     DateTime? reviewDue;
     if (selectedReminder != ReminderOption.none) {
+      // if (selectedReminder == ReminderOption.tenSeconds) {
+      //   reviewDue = now.add(const Duration(seconds: 10));
+      // } else {
       final dueDate = appliedAt.add(Duration(days: selectedReminder.days));
       reviewDue = DateTime(
         dueDate.year,
@@ -154,6 +164,7 @@ class ApplicationFormController extends FormController {
         dueDate.day,
         ReminderService.reminderHour,
       );
+      // }
     }
 
     final app = InputApplication(
@@ -188,13 +199,31 @@ class ApplicationFormController extends FormController {
 
     // Programar notificación de recordatorio si corresponde
     if (reviewDue != null) {
+      String cycleName = '';
+      for (final c in availableCycles) {
+        if (c.id == selectedCycleId) {
+          cycleName = c.title;
+          break;
+        }
+      }
+      if (cycleName.isEmpty && selectedCycleId != null) {
+        final fetched = await _cycleRepository.getById(selectedCycleId!);
+        if (fetched != null) {
+          cycleName = fetched.title;
+        }
+      }
+      final plantingName = cycleName.isNotEmpty ? cycleName : 'la siembra';
+      final appliedDateFormatted = Formatters.date(app.appliedAt);
+
       await _reminderService.requestPermission();
       await _reminderService.schedule(
         id: savedId,
         at: reviewDue,
-        title: 'Revisión de cultivo pendiente',
+        title: cycleName.isNotEmpty
+            ? 'Revisión en $cycleName'
+            : 'Revisión de cultivo pendiente',
         body:
-            'Es momento de revisar la reacción a ${app.productName}. ¿Cómo respondió la planta?',
+            'Es momento de revisar la reacción a ${app.productName} en $plantingName (aplicado el $appliedDateFormatted). ¿Cómo respondió la planta?',
         payload: savedId.toString(),
       );
     } else if (isEditing) {
@@ -284,10 +313,7 @@ class FollowUpFormController extends FormController {
     }
 
     final formattedSymptoms = selectedVerdict == ReactionVerdict.negative
-        ? SymptomsData.format(
-            selectedSymptoms,
-            symptomsDetailsController.text,
-          )
+        ? SymptomsData.format(selectedSymptoms, symptomsDetailsController.text)
         : null;
 
     await _repository.updateReaction(

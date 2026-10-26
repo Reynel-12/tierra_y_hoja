@@ -12,6 +12,7 @@ import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/app_top_bar.dart';
 import '../../../core/widgets/badges.dart';
 import '../../../core/widgets/layout.dart';
+import '../../backup/views/backup_restore_view.dart';
 import '../../costs/views/cost_summary_view.dart';
 import '../../history/views/cycle_comparison_view.dart';
 import '../../history/views/experience_search_view.dart';
@@ -81,6 +82,27 @@ class MoreView extends StatelessWidget {
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute<void>(
                           builder: (_) => const CycleComparisonView(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpace.section),
+
+              // Copias de Seguridad y Restauración
+              const SectionHeader(title: 'Copias y Respaldo'),
+              AppCard(
+                child: Column(
+                  children: [
+                    ListRow(
+                      icon: AppIcons.database,
+                      title: 'Copias de Seguridad y Restauración',
+                      subtitle:
+                          'Respalde o restaure la base de datos y fotos completas',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const BackupRestoreView(),
                         ),
                       ),
                     ),
@@ -199,7 +221,9 @@ class MoreView extends StatelessWidget {
                           color: c.positive,
                         ),
                         const SizedBox(width: AppSpace.xs),
-                        Text('Base de datos SQLite local', style: t.label),
+                        Expanded(
+                          child: Text('Base de datos SQLite local', style: t.label),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -211,7 +235,9 @@ class MoreView extends StatelessWidget {
                           color: c.positive,
                         ),
                         const SizedBox(width: AppSpace.xs),
-                        Text('Fotos respaldadas en la galería', style: t.label),
+                        Expanded(
+                          child: Text('Fotos respaldadas en la galería', style: t.label),
+                        ),
                       ],
                     ),
                   ],

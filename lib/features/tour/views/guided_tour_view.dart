@@ -64,6 +64,8 @@ class _GuidedTourViewState extends State<GuidedTourView> {
       case 7:
         return const HistoryMemoryStepSimulator();
       case 8:
+        return const BackupStepSimulator();
+      case 9:
         return const HomeFabStepSimulator();
       default:
         return const PlotStepSimulator();

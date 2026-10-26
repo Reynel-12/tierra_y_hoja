@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -14,9 +16,11 @@ import 'core/services/speech_service.dart';
 import 'core/state/theme_controller.dart';
 import 'core/widgets/animated_splash.dart';
 import 'features/activities/data/activity_repository.dart';
+import 'features/backup/services/backup_service.dart';
 import 'features/costs/data/cost_repository.dart';
 import 'features/cycles/data/cycle_repository.dart';
 import 'features/field_log/data/application_repository.dart';
+import 'features/field_log/views/follow_up_form_view.dart';
 import 'features/history/data/history_repository.dart';
 import 'features/plots/data/plot_repository.dart';
 import 'features/tour/controllers/guided_tour_controller.dart';
@@ -70,6 +74,7 @@ class _AppBootstrapData {
     required this.tourController,
     required this.themeController,
     required this.packageInfo,
+    required this.backupService,
   });
 
   final AppDatabase database;
@@ -86,6 +91,7 @@ class _AppBootstrapData {
   final GuidedTourController tourController;
   final ThemeController themeController;
   final PackageInfo packageInfo;
+  final BackupService backupService;
 }
 
 class TierraYHojaApp extends StatefulWidget {
@@ -149,7 +155,8 @@ class _TierraYHojaAppState extends State<TierraYHojaApp> {
       });
     }
 
-    final packageInfo = widget.packageInfo ??
+    final packageInfo =
+        widget.packageInfo ??
         await () async {
           try {
             return await PackageInfo.fromPlatform();
@@ -157,11 +164,17 @@ class _TierraYHojaAppState extends State<TierraYHojaApp> {
             return PackageInfo(
               appName: 'Tierra & Hoja',
               packageName: 'com.tierrayhoja.app',
-              version: '1.1.3',
-              buildNumber: '5',
+              version: '1.2.0',
+              buildNumber: '7',
             );
           }
         }();
+
+    final backupService = BackupService(
+      database,
+      photoService,
+      packageInfo: packageInfo,
+    );
 
     _data = _AppBootstrapData(
       database: database,
@@ -178,6 +191,7 @@ class _TierraYHojaAppState extends State<TierraYHojaApp> {
       tourController: tourController,
       themeController: themeController,
       packageInfo: packageInfo,
+      backupService: backupService,
     );
   }
 
@@ -223,14 +237,74 @@ class _TierraYHojaAppState extends State<TierraYHojaApp> {
           value: data.tourController,
         ),
         Provider<PackageInfo>.value(value: data.packageInfo),
+        Provider<BackupService>.value(value: data.backupService),
       ],
       child: const _AppContent(),
     );
   }
 }
 
-class _AppContent extends StatelessWidget {
+class _AppContent extends StatefulWidget {
   const _AppContent();
+
+  @override
+  State<_AppContent> createState() => _AppContentState();
+}
+
+class _AppContentState extends State<_AppContent> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  StreamSubscription<String>? _sub;
+  bool _isNavigating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final reminderService = context.read<ReminderService>();
+    _sub = reminderService.taps.listen((payload) {
+      reminderService.takeLaunchPayload();
+      _handleNotificationPayload(payload);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final launchPayload = reminderService.takeLaunchPayload();
+      if (launchPayload != null) {
+        _handleNotificationPayload(launchPayload);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _handleNotificationPayload(String payload) async {
+    final id = int.tryParse(payload);
+    if (id == null || _isNavigating) return;
+
+    _isNavigating = true;
+    try {
+      final tourController = context.read<GuidedTourController>();
+      if (!tourController.isCompleted) return;
+
+      final appRepo = context.read<ApplicationRepository>();
+      final app = await appRepo.getById(id);
+      if (app != null && mounted) {
+        if (_navigatorKey.currentState == null) {
+          await Future<void>.delayed(const Duration(milliseconds: 250));
+        }
+        await _navigatorKey.currentState?.push(
+          MaterialPageRoute<void>(
+            builder: (_) => FollowUpFormView(application: app),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error abriendo revisión desde notificación: $e');
+    } finally {
+      _isNavigating = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -238,6 +312,7 @@ class _AppContent extends StatelessWidget {
     final tourController = context.watch<GuidedTourController>();
 
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Tierra & Hoja',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,

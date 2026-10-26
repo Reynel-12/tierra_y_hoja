@@ -5,7 +5,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tierra_y_hoja/core/database/data_changes.dart';
-import 'package:tierra_y_hoja/core/design/app_icons.dart';
 import 'package:tierra_y_hoja/core/design/app_theme.dart';
 import 'package:tierra_y_hoja/core/widgets/form/verdict_tiles.dart';
 import 'package:tierra_y_hoja/core/widgets/layout.dart';
@@ -27,11 +26,33 @@ import 'package:tierra_y_hoja/features/history/views/event_detail_sheet.dart';
 import 'package:tierra_y_hoja/features/history/views/experience_search_view.dart';
 import 'package:tierra_y_hoja/features/plots/data/plot_repository.dart';
 import 'package:tierra_y_hoja/features/plots/models/plot.dart';
+import 'package:tierra_y_hoja/core/services/photo_storage_service.dart';
+import 'package:tierra_y_hoja/core/services/reminder_service.dart';
+import 'package:tierra_y_hoja/features/field_log/data/application_repository.dart';
+import 'package:tierra_y_hoja/features/field_log/views/application_form_view.dart';
 import 'package:tierra_y_hoja/features/plots/views/plot_detail_view.dart';
 import 'package:tierra_y_hoja/features/tour/controllers/guided_tour_controller.dart';
 import 'package:tierra_y_hoja/features/tour/views/guided_tour_view.dart';
 
 class FakeCostRepo implements CostRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakeAppRepo implements ApplicationRepository {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class FakePhotoService implements PhotoStorageService {
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+
+  @override
+  Future<void> deleteAll(Iterable<String?> paths) async {}
+}
+
+class FakeReminderService implements ReminderService {
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
@@ -318,7 +339,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Step 1 is rendered
-    expect(find.text('Paso 1 de 9'), findsOneWidget);
+    expect(find.text('Paso 1 de 10'), findsOneWidget);
     expect(find.text('Módulo de Parcelas y Lotes'), findsOneWidget);
     expect(find.text('¿Por qué en este orden?'), findsOneWidget);
     expect(find.text('¿Dónde se ubica en la aplicación?'), findsOneWidget);
@@ -329,12 +350,12 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Step 2 is now shown
-    expect(find.text('Paso 2 de 9'), findsOneWidget);
+    expect(find.text('Paso 2 de 10'), findsOneWidget);
     expect(find.text('Módulo de Ciclos de Siembra'), findsOneWidget);
     expect(find.text('Probar: Abrir ciclo de siembra'), findsOneWidget);
   });
 
-  testWidgets('GuidedTourView allows jumping directly to Step 9 and testing demo actions', (tester) async {
+  testWidgets('GuidedTourView allows jumping directly to Step 9 and Step 10 and testing demo actions', (tester) async {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2.0;
 
@@ -353,11 +374,43 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Jump directly to Step 9 using controller
+    // Jump directly to Step 9 (Copias de Seguridad)
     tourController.goToStep(8);
     await tester.pumpAndSettle();
 
-    expect(find.text('Paso 9 de 9'), findsOneWidget);
+    expect(find.text('Paso 9 de 10'), findsOneWidget);
+    expect(find.text('Copias de Seguridad y Respaldo'), findsOneWidget);
+    expect(find.textContaining('Descargas'), findsWidgets);
+
+    // Test changing folder demo action
+    await tester.ensureVisible(find.text('Probar: Cambiar carpeta a "Descargas"'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Probar: Cambiar carpeta a "Descargas"'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.textContaining('Carpeta cambiada a "Descargas"'), findsOneWidget);
+
+    // Wait for demo SnackBar to dismiss
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
+    // Test creating backup demo action
+    await tester.ensureVisible(find.text('Probar: Crear copia de seguridad'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Probar: Crear copia de seguridad'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.textContaining('Copia creada:'), findsOneWidget);
+
+    // Wait for demo SnackBar to dismiss
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
+    // Jump directly to Step 10 using controller
+    tourController.goToStep(9);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Paso 10 de 10'), findsOneWidget);
     expect(find.text('Pantalla de Inicio y Acceso Rápido'), findsOneWidget);
     // Test a simulated demo FAB action
     await tester.ensureVisible(find.text('Insumo'));
@@ -1044,6 +1097,42 @@ void main() {
       find.text('0.80 m entre surcos, 0.20 m entre plantas, 2 semillas por postura'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('ApplicationFormView renders reminder option chips and allows selecting them', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider<ApplicationRepository>(create: (_) => FakeAppRepo()),
+          Provider<CycleRepository>(create: (_) => FakeCycleRepo()),
+          Provider<PhotoStorageService>(create: (_) => FakePhotoService()),
+          Provider<ReminderService>(create: (_) => FakeReminderService()),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const ApplicationFormView(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify reminder options are displayed
+    expect(find.text('¿Cuándo desea revisar la reacción del cultivo?'), findsOneWidget);
+    expect(find.text('3 días'), findsOneWidget);
+    expect(find.text('5 días'), findsOneWidget);
+    expect(find.text('7 días'), findsOneWidget);
+    expect(find.text('Sin recordatorio'), findsOneWidget);
+
+    // Tap on '3 días' chip
+    await tester.ensureVisible(find.text('3 días'));
+    await tester.tap(find.text('3 días'));
+    await tester.pumpAndSettle();
   });
 }
 

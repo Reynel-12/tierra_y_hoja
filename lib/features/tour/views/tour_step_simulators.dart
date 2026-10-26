@@ -999,7 +999,279 @@ class HistoryMemoryStepSimulator extends StatelessWidget {
 }
 
 // =============================================================================
-// SIMULADOR 9: PANTALLA DE INICIO Y ACCESO RÁPIDO FAB
+// SIMULADOR 9: COPIAS DE SEGURIDAD Y RESPALDO
+// =============================================================================
+class BackupStepSimulator extends StatefulWidget {
+  const BackupStepSimulator({super.key});
+
+  @override
+  State<BackupStepSimulator> createState() => _BackupStepSimulatorState();
+}
+
+class _BackupStepSimulatorState extends State<BackupStepSimulator> {
+  bool _isRecommendedFolder = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.t;
+    final c = context.c;
+
+    final currentFolderPath = _isRecommendedFolder
+        ? '/almacenamiento/emulado/0/Descargas/Copias_Finca'
+        : '/almacenamiento/emulado/0/Android/data/com.tierrayhoja/files/backups';
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const DemoHeaderBadge(),
+          const SizedBox(height: AppSpace.md),
+          Text('Simulador de Copia y Respaldo', style: t.title),
+          const SizedBox(height: AppSpace.xs),
+          Text(
+            'Guarde todos los registros de su finca y sus fotografías en un solo archivo seguro sin necesidad de internet.',
+            style: t.bodySm,
+          ),
+          const SizedBox(height: AppSpace.md),
+
+          // Tarjeta de carpeta de almacenamiento con recomendación destacada
+          Container(
+            padding: const EdgeInsets.all(AppSpace.md),
+            decoration: BoxDecoration(
+              color: c.surfaceAlt,
+              borderRadius: AppRadius.control,
+              border: Border.all(
+                color: _isRecommendedFolder
+                    ? c.positive.withValues(alpha: 0.5)
+                    : c.outline,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: AppSpace.xs,
+                  runSpacing: AppSpace.xs,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          AppIcons.folder,
+                          size: AppSize.iconSm,
+                          color: _isRecommendedFolder ? c.positive : c.primary,
+                        ),
+                        const SizedBox(width: AppSpace.xs),
+                        Text(
+                          'Carpeta de guardado:',
+                          style: t.label.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpace.sm,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _isRecommendedFolder
+                            ? c.positive.withValues(alpha: 0.15)
+                            : c.accentSoft,
+                        borderRadius: AppRadius.pill,
+                      ),
+                      child: Text(
+                        _isRecommendedFolder
+                            ? 'Recomendada (Fácil de encontrar)'
+                            : 'Predeterminada del sistema',
+                        style: t.caption.copyWith(
+                          color: _isRecommendedFolder
+                              ? c.positive
+                              : c.accentText,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpace.sm),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpace.sm,
+                    vertical: AppSpace.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: c.surface,
+                    borderRadius: AppRadius.chip,
+                    border: Border.all(color: c.outline),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Text(
+                      currentFolderPath,
+                      style: t.caption.copyWith(
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w600,
+                        color: c.ink,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpace.sm),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(AppIcons.lightbulb, size: 16, color: c.accentText),
+                    const SizedBox(width: AppSpace.xs),
+                    Expanded(
+                      child: Text(
+                        'Recomendación: Cambie la carpeta predeterminada por una conocida como "Descargas" para encontrar sus copias rápidamente en su teléfono.',
+                        style: t.caption.copyWith(
+                          color: c.accentText,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpace.sm),
+                AppButton.outline(
+                  icon: AppIcons.folderOpen,
+                  label: _isRecommendedFolder
+                      ? 'Probar: Volver a carpeta del sistema'
+                      : 'Probar: Cambiar carpeta a "Descargas"',
+                  onPressed: () {
+                    setState(() {
+                      _isRecommendedFolder = !_isRecommendedFolder;
+                    });
+                    showTourDemoFeedback(
+                      context,
+                      _isRecommendedFolder
+                          ? '✓ Carpeta cambiada a "Descargas": ¡Ahora sus copias serán muy fáciles de encontrar!'
+                          : '✓ Carpeta restablecida a la predeterminada del sistema.',
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpace.md),
+
+          // Resumen de datos protegidos en cada copia
+          Text('Información que se protege en cada copia:', style: t.label),
+          const SizedBox(height: AppSpace.xs),
+          Wrap(
+            spacing: AppSpace.xs,
+            runSpacing: AppSpace.xs,
+            children: [
+              _buildDataChip(
+                context,
+                icon: AppIcons.plot,
+                label: 'Lotes y Parcelas',
+              ),
+              _buildDataChip(
+                context,
+                icon: AppIcons.cycle,
+                label: 'Siembras y Ciclos',
+              ),
+              _buildDataChip(
+                context,
+                icon: AppIcons.application,
+                label: 'Insumos y Labores',
+              ),
+              _buildDataChip(
+                context,
+                icon: AppIcons.costs,
+                label: 'Cuentas y Ventas',
+              ),
+              _buildDataChip(
+                context,
+                icon: AppIcons.photo,
+                label: 'Todas las Fotos del campo',
+                highlight: true,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpace.lg),
+
+          // Acciones de prueba interactivas
+          AppButton.primary(
+            icon: AppIcons.database,
+            label: 'Probar: Crear copia de seguridad',
+            onPressed: () {
+              showTourDemoFeedback(
+                context,
+                '✓ Copia creada: Toda la información y fotos se guardaron en un único archivo seguro.',
+              );
+            },
+          ),
+          // const SizedBox(height: AppSpace.sm),
+          // AppButton.secondary(
+          //   icon: AppIcons.whatsapp,
+          //   label: 'Probar: Compartir copia por WhatsApp',
+          //   onPressed: () {
+          //     showTourDemoFeedback(
+          //       context,
+          //       '✓ Archivo de copia listo para enviar a otro teléfono por WhatsApp o guardar en su correo.',
+          //     );
+          //   },
+          // ),
+          const SizedBox(height: AppSpace.sm),
+          AppButton.outline(
+            icon: AppIcons.restore,
+            label: 'Probar: Restaurar una copia',
+            onPressed: () {
+              showTourDemoFeedback(
+                context,
+                '✓ Al restaurar, la app analiza el archivo y recupera toda su información automáticamente.',
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDataChip(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    bool highlight = false,
+  }) {
+    final c = context.c;
+    final t = context.t;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpace.sm, vertical: 6),
+      decoration: BoxDecoration(
+        color: highlight ? c.primarySoft : c.surfaceAlt,
+        borderRadius: AppRadius.pill,
+        border: Border.all(
+          color: highlight ? c.primary.withValues(alpha: 0.4) : c.outline,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: highlight ? c.primary : c.inkSoft),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: t.caption.copyWith(
+              fontWeight: highlight ? FontWeight.bold : FontWeight.w600,
+              color: highlight ? c.primary : c.ink,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =============================================================================
+// SIMULADOR 10: PANTALLA DE INICIO Y ACCESO RÁPIDO FAB
 // =============================================================================
 class HomeFabStepSimulator extends StatelessWidget {
   const HomeFabStepSimulator({super.key});

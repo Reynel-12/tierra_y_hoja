@@ -141,6 +141,27 @@ Registro rápido de compras de insumos (precio del saco de abono, semilla, jorna
 
 Cálculo automático del costo total del ciclo vs. la venta de la cosecha para mostrar la ganancia neta real.
 
+7. Módulo de Copias de Seguridad y Restauración Completa (Backups y Restauraciones)
+En entornos rurales donde la conectividad a internet es limitada o inexistente, este módulo otorga total soberanía y portabilidad al agricultor sobre sus datos agrícolas y su evidencia fotográfica, permitiendo crear respaldos rápidos, compartirlos directamente con otros teléfonos o técnicos y restaurarlos de forma segura en cualquier momento.
+Respaldo Integral y Rápido (Base de Datos + Fotos):
+- Empaquetado completo en un archivo comprimido único (`.tyh.zip` / `.tyh`): consolida en un solo paquete ligero la base de datos SQLite con todos los registros históricos (`tierra_y_hoja.db`) y la totalidad de fotografías tomadas en campo (`photos/`), realizando un punto de control (WAL checkpoint) previo para asegurar la consistencia transaccional de los datos.
+- Manifiesto de metadatos (`manifest.json`): cada archivo de respaldo incluye metadatos de versión de la app, versión del esquema de base de datos, fecha y hora de creación, y un desglose numérico exacto de los datos contenidos (lotes, ciclos de siembra, aplicaciones de insumos, labores culturales, incidencias, gastos, ventas y fotografías).
+- Panel de estadísticas en vivo: la pantalla muestra antes de la copia el recuento exacto de los elementos que se van a respaldar para certeza del usuario.
+Gestión de Ubicación y Rutas de Almacenamiento:
+- Visualización de la ruta activa: se muestra de manera transparente la carpeta actual donde se guardan los archivos de respaldo en el dispositivo móvil.
+- Flexibilidad de cambio de carpeta: permite cambiar la ruta predeterminada de la aplicación a una carpeta personalizada en la memoria interna, tarjeta SD o almacenamiento compartido seleccionándola directamente desde el explorador del sistema con confirmación inmediata y sin pasos adicionales.
+- Recomendación al usuario (destacada en el Tour Guiado - Paso 9): Se recomienda cambiar la ruta predeterminada a una carpeta de fácil acceso (como "Descargas" o "Documentos") para que el agricultor pueda localizar rápidamente sus copias al conectar el teléfono a una computadora o compartirlas por WhatsApp.
+- Botón de restablecer: opción para regresar a la ruta predeterminada de la app con un solo toque.
+Compartir Directamente mediante share_plus:
+- Envío directo a WhatsApp, correo, Bluetooth, Telegram o Google Drive utilizando las hojas de compartición nativas del sistema operativo.
+- Al generar una copia exitosa, la app abre un diálogo de confirmación con acceso rápido al botón "Compartir copia ahora" o para cerrarlo y conservarlo en almacenamiento local.
+Restauración Verificada y Protección de Datos:
+- Selector de archivos de respaldo: permite escoger cualquier archivo `.tyh.zip` o `.zip` desde el explorador del dispositivo o descargas.
+- Inspección e integridad pre-restauración: antes de alterar los datos locales, el módulo analiza la estructura interna del archivo, valida la cabecera SQLite legítima y extrae el manifiesto técnico para evitar restaurar archivos corruptos o incompatibles.
+- Diálogo de confirmación con desglose detallado: muestra al productor una ficha clara con el nombre de la app origen, versión, fecha de creación, tamaño y cantidad de lotes, siembras, registros y fotos que se van a recuperar, solicitando confirmación explícita mediante un botón de advertencia ("Reemplazar y restaurar").
+- Portabilidad y re-vinculación automática de fotos: los registros de SQLite guardan rutas de fotografías que pueden diferir de un teléfono a otro debido a los sandboxes de Android o identificadores UUID de iOS. Durante la restauración, el sistema re-asocia dinámicamente las rutas de cada foto (`fixPhotoPaths`) para garantizar que todas las evidencias fotográficas de lotes, aplicaciones y labores se visualicen sin enlaces rotos en el nuevo dispositivo.
+- Reactividad inmediata: al concluir la restauración, se reactivan las conexiones y se notifican los cambios a través del gestor `DataChanges`, actualizando instantáneamente todas las vistas de la aplicación sin obligar a reiniciar el teléfono.
+
 Consideraciones Técnicas Críticas para Flutter
 Arquitectura Offline-First:
 
