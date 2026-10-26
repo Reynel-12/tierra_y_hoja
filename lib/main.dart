@@ -164,8 +164,8 @@ class _TierraYHojaAppState extends State<TierraYHojaApp> {
             return PackageInfo(
               appName: 'Tierra & Hoja',
               packageName: 'com.tierrayhoja.app',
-              version: '1.2.0',
-              buildNumber: '7',
+              version: '1.2.1',
+              buildNumber: '8',
             );
           }
         }();

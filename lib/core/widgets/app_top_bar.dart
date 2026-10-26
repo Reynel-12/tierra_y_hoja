@@ -66,8 +66,8 @@ class _AppTopBarState extends State<AppTopBar> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final canPop = Navigator.of(context).canPop();
-    final hasLeading = widget.showBack && canPop;
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
+    final hasLeading = widget.showBack && (canPop || widget.onBack != null);
 
     return AppBar(
       toolbarHeight: 64,

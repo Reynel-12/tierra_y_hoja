@@ -32,7 +32,7 @@ class MoreView extends StatelessWidget {
     final appVersion = packageInfo?.version ?? '1.1.0';
 
     return Scaffold(
-      appBar: const AppTopBar(title: 'Más opciones'),
+      appBar: const AppTopBar(title: 'Más opciones', showBack: false),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(pad, AppSpace.sm, pad, AppSpace.x4),
         child: ContentWidth(

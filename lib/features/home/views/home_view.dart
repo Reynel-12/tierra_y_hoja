@@ -59,6 +59,7 @@ class _HomeContent extends StatelessWidget {
     return Scaffold(
       appBar: AppTopBar(
         title: 'Tierra & Hoja',
+        showBack: false,
         actions: [
           IconButton(
             tooltip: 'Balance económico',

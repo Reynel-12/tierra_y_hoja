@@ -69,7 +69,7 @@ class _ExperienceSearchContentState extends State<_ExperienceSearchContent> {
     final pad = context.screenPadding;
 
     return Scaffold(
-      appBar: const AppTopBar(title: 'Memoria y Experiencias'),
+      appBar: const AppTopBar(title: 'Memoria y Experiencias', showBack: false),
       body: Column(
         children: [
           // Barra de búsqueda de la memoria

@@ -35,6 +35,18 @@ class _GuidedTourViewState extends State<GuidedTourView> {
   final ScrollController _scrollController = ScrollController();
   final ScrollController _chipScrollController = ScrollController();
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isRevisit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<GuidedTourController>().goToStep(0);
+        }
+      });
+    }
+  }
+
   void _scrollToTop() {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -98,6 +110,7 @@ class _GuidedTourViewState extends State<GuidedTourView> {
 
     if (confirmed == true && context.mounted) {
       if (widget.isRevisit) {
+        controller.goToStep(0);
         Navigator.of(context).pop();
       } else {
         await controller.completeTour();
@@ -110,6 +123,7 @@ class _GuidedTourViewState extends State<GuidedTourView> {
     GuidedTourController controller,
   ) async {
     if (widget.isRevisit) {
+      controller.goToStep(0);
       Navigator.of(context).pop();
     } else {
       await controller.completeTour();
@@ -150,20 +164,32 @@ class _GuidedTourViewState extends State<GuidedTourView> {
     final totalSteps = controller.totalSteps;
     final isLastStep = controller.isLastStep;
 
-    return Scaffold(
-      backgroundColor: c.bg,
-      appBar: AppTopBar(
-        title: widget.isRevisit ? 'Tour Guiado' : 'Tierra & Hoja',
-        showBack: widget.isRevisit,
-        actions: [
-          if (!widget.isRevisit)
-            TextButton.icon(
-              icon: const Icon(AppIcons.forward, size: 16),
-              label: const Text('Saltar guía'),
-              onPressed: () => _onSkipTour(context, controller),
-            ),
-        ],
-      ),
+    return PopScope(
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop && widget.isRevisit) {
+          controller.goToStep(0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: c.bg,
+        appBar: AppTopBar(
+          title: widget.isRevisit ? 'Tour Guiado' : 'Tierra & Hoja',
+          showBack: widget.isRevisit,
+          onBack: () {
+            if (widget.isRevisit) {
+              controller.goToStep(0);
+            }
+            Navigator.of(context).maybePop();
+          },
+          actions: [
+            if (!widget.isRevisit)
+              TextButton.icon(
+                icon: const Icon(AppIcons.forward, size: 16),
+                label: const Text('Saltar guía'),
+                onPressed: () => _onSkipTour(context, controller),
+              ),
+          ],
+        ),
       body: SafeArea(
         child: Column(
           children: [
@@ -482,8 +508,9 @@ class _GuidedTourViewState extends State<GuidedTourView> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 /// Fila que describe un campo específico de entrada, su tipo de dato y su función.

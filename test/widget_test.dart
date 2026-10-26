@@ -31,6 +31,10 @@ import 'package:tierra_y_hoja/core/services/reminder_service.dart';
 import 'package:tierra_y_hoja/features/field_log/data/application_repository.dart';
 import 'package:tierra_y_hoja/features/field_log/views/application_form_view.dart';
 import 'package:tierra_y_hoja/features/plots/views/plot_detail_view.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tierra_y_hoja/core/design/app_icons.dart';
+import 'package:tierra_y_hoja/core/state/theme_controller.dart';
+import 'package:tierra_y_hoja/features/more/views/more_view.dart';
 import 'package:tierra_y_hoja/features/tour/controllers/guided_tour_controller.dart';
 import 'package:tierra_y_hoja/features/tour/views/guided_tour_view.dart';
 
@@ -428,6 +432,72 @@ void main() {
     await tester.tap(find.text('¡Comenzar a registrar!'));
     await tester.pumpAndSettle();
     expect(tourController.isCompleted, isTrue);
+  });
+
+  testWidgets('Revisiting GuidedTourView from MoreView resets step and leaves no back arrow on root views', (tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+
+    final tourController = GuidedTourController();
+    await tourController.init();
+    await tourController.completeTour();
+    final themeController = _FakeThemeController();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ThemeController>.value(value: themeController),
+          ChangeNotifierProvider<GuidedTourController>.value(value: tourController),
+          Provider<PackageInfo>.value(
+            value: PackageInfo(
+              appName: 'Tierra & Hoja',
+              packageName: 'com.tierrayhoja.app',
+              version: '1.2.0',
+              buildNumber: '7',
+            ),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const MoreView(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Verify MoreView top bar has no back button
+    expect(find.text('Más opciones'), findsOneWidget);
+    expect(find.byIcon(AppIcons.back), findsNothing);
+
+    // Tap on 'Tour Guiado de la Aplicación'
+    await tester.ensureVisible(find.text('Tour Guiado de la Aplicación'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Tour Guiado de la Aplicación'));
+    await tester.pumpAndSettle();
+
+    // GuidedTourView is opened as revisit: starts at Step 1 and has back button
+    expect(find.text('Tour Guiado'), findsOneWidget);
+    expect(find.text('Paso 1 de 10'), findsOneWidget);
+    expect(find.byIcon(AppIcons.back), findsOneWidget);
+
+    // Jump to step 10
+    tourController.goToStep(9);
+    await tester.pumpAndSettle();
+    expect(find.text('Paso 10 de 10'), findsOneWidget);
+
+    // Tap '¡Comenzar a registrar!' to finish revisit
+    await tester.ensureVisible(find.text('¡Comenzar a registrar!'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('¡Comenzar a registrar!'));
+    await tester.pumpAndSettle();
+
+    // Returned to MoreView: MUST NOT have a back button!
+    expect(find.text('Más opciones'), findsOneWidget);
+    expect(find.byIcon(AppIcons.back), findsNothing);
+
+    // Controller should be reset to step 0
+    expect(tourController.currentStepIndex, 0);
   });
 
   testWidgets('ExperienceSearchView renders category filter chips including Todos and Cargar más datos button', (tester) async {
@@ -1249,6 +1319,14 @@ class _TimelineWithPhotosHistoryRepo extends FakeHistoryRepo {
           plotName: 'Lote El Rincón',
         ),
       ];
+}
+
+class _FakeThemeController extends ChangeNotifier implements ThemeController {
+  @override
+  ThemeMode get themeMode => ThemeMode.system;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
 
